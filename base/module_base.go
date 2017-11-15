@@ -3,9 +3,9 @@ package base
 import (
 	"github.com/name5566/leaf/log"
 	"net"
-	"server/common/define"
-	"server/common/mgr"
-	"server/common/rpc_struct"
+	"github.com/99SHOU/joyserver/common/define"
+	"github.com/99SHOU/joyserver/common/mgr"
+	"github.com/99SHOU/joyserver/common/rpc_struct"
 	"strconv"
 	"strings"
 )

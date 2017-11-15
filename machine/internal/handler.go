@@ -2,7 +2,7 @@ package internal
 
 import (
 	"github.com/name5566/leaf/log"
-	"server/common/rpc_struct"
+	"github.com/99SHOU/joyserver/common/rpc_struct"
 )
 
 type RpcHandler struct {

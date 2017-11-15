@@ -6,8 +6,8 @@ import (
 	"net"
 	"net/http"
 	"net/rpc"
-	"server/common/define"
-	"server/common/module_client"
+	"github.com/99SHOU/joyserver/common/define"
+	"github.com/99SHOU/joyserver/common/module_client"
 	"strconv"
 )
 

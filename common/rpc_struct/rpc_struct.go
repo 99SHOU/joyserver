@@ -1,7 +1,7 @@
 package rpc_struct
 
 import (
-	"server/common/define"
+	"github.com/99SHOU/joyserver/common/define"
 )
 
 //Server To Machine Start

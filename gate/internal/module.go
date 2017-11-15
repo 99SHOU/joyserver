@@ -2,10 +2,10 @@ package internal
 
 import (
 	//"github.com/name5566/leaf/log"
-	"server/base"
-	"server/common/define"
-	"server/common/mgr"
-	"server/common/module_client"
+	"github.com/99SHOU/joyserver/base"
+	"github.com/99SHOU/joyserver/common/define"
+	"github.com/99SHOU/joyserver/common/mgr"
+	"github.com/99SHOU/joyserver/common/module_client"
 )
 
 type Module struct {

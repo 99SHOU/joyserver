@@ -1,7 +1,7 @@
 package machine
 
 import (
-	"server/machine/internal"
+	"github.com/99SHOU/joyserver/machine/internal"
 )
 
 var (

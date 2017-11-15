@@ -4,7 +4,7 @@ import (
 	"errors"
 	"github.com/name5566/leaf/log"
 	"net"
-	"server/common/define"
+	"github.com/99SHOU/joyserver/common/define"
 	"strconv"
 	"sync"
 )

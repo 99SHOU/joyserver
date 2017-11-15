@@ -1,7 +1,7 @@
 package gate
 
 import (
-	"server/gate/internal"
+	"github.com/99SHOU/joyserver/gate/internal"
 )
 
 var (

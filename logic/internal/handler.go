@@ -1,7 +1,7 @@
 package internal
 
 import (
-	"server/common/rpc_struct"
+	"github.com/99SHOU/joyserver/common/rpc_struct"
 )
 
 type RpcHandler struct {

@@ -19,7 +19,7 @@ var Server struct {
 }
 
 func init() {
-	data, err := ioutil.ReadFile("../../bin/conf/server.json")
+	data, err := ioutil.ReadFile("./bin/conf/server.json")
 	if err != nil {
 		log.Fatal("%v", err)
 	}

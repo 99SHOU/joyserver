@@ -1,7 +1,7 @@
 package center
 
 import (
-	"server/center/internal"
+	"github.com/99SHOU/joyserver/center/internal"
 )
 
 var (

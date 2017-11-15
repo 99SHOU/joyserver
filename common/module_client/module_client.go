@@ -3,7 +3,7 @@ package module_client
 import (
 	"fmt"
 	"net/rpc"
-	"server/common/define"
+	"github.com/99SHOU/joyserver/common/define"
 )
 
 type ModuleClient struct {
