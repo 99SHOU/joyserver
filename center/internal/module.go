@@ -2,36 +2,38 @@ package internal
 
 import (
 	//"github.com/name5566/leaf/log"
-	"github.com/99SHOU/joyserver/base"
+	"github.com/99SHOU/joyserver/common/base"
+	"github.com/99SHOU/joyserver/common/db/mysql"
 	"github.com/99SHOU/joyserver/common/define"
 	"github.com/99SHOU/joyserver/common/mgr"
-	"github.com/99SHOU/joyserver/common/module_client"
+	"github.com/99SHOU/joyserver/common/pb"
+	"github.com/99SHOU/joyserver/common/rpc_client"
 )
 
 type Module struct {
 	base.Module
-	moduleIdMgr *mgr.ModuleIdMgr
+	moduleIdMgr      *mgr.ModuleIdMgr
+	accountVerifyMgr *AccountVerifyMgr
 }
 
 func (m *Module) OnInit() {
-	m.ServerStatu = define.SERVER_STATU_INVALUE
-	m.ServerType = define.SERVER_TYPE_CENTER
+	m.ServerType = pb.SERVER_TYPE_CENTER
 	m.moduleIdMgr = &mgr.ModuleIdMgr{StartId: define.CENTER_MODULE_ID}
 	m.ModuleId = define.CENTER_MODULE_ID
-	m.Port = define.CENTER_PORT
-	m.RpcMgr = &mgr.RpcMgr{ModuleClient: make(map[int]*module_client.ModuleClient), ServerType: m.ServerType}
+	m.RpcPort = define.CENTER_RPC_PORT
+	m.RpcMgr = &mgr.RpcMgr{RpcClient: make(map[uint32]*rpc_client.RpcClient), ServerType: m.ServerType}
 	m.RpcHandler = &RpcHandler{module: m}
 
-	m.ServerStatu = define.SERVER_STATU_REFUSE_SERVICE
+	db := mysql.Open(define.MYSQL_DNS)
+	m.accountVerifyMgr = &AccountVerifyMgr{db: db}
+	m.accountVerifyMgr.Init()
 
 	m.CreateRpcClientToMachine()
 	m.StartRpcServer(m.RpcHandler)
-
-	m.ServerStatu = define.SERVER_STATU_START_SERVICE
 }
 
 func (m *Module) OnDestroy() {
-
+	m.accountVerifyMgr.Destroy()
 }
 
 func (m *Module) Run(chan bool) {

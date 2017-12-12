@@ -6,15 +6,15 @@ import (
 	"net"
 	"net/http"
 	"net/rpc"
-	"github.com/99SHOU/joyserver/common/define"
-	"github.com/99SHOU/joyserver/common/module_client"
+	"github.com/99SHOU/joyserver/common/pb"
+	"github.com/99SHOU/joyserver/common/rpc_client"
 	"strconv"
 )
 
 type RpcMgr struct {
-	ModuleClient map[int]*module_client.ModuleClient
-	ServerAddr   string
-	ServerType   define.SERVER_TYPE
+	RpcClient  map[uint32]*rpc_client.RpcClient
+	ServerAddr string
+	ServerType pb.SERVER_TYPE
 }
 
 func (mgr *RpcMgr) OnInit() {
@@ -29,30 +29,30 @@ func (mgr *RpcMgr) Run() {
 
 }
 
-func (mgr *RpcMgr) NewModuleClient(serverAddr string, moduleId int, serverType define.SERVER_TYPE) *module_client.ModuleClient {
+func (mgr *RpcMgr) NewRpcClient(serverAddr string, moduleId uint32, serverType pb.SERVER_TYPE) *rpc_client.RpcClient {
 	//rpcClient, err := rpc.DialHTTP("tcp", serverAddr)
-	rpcClient, err := rpc.DialHTTPPath("tcp", serverAddr, rpc.DefaultRPCPath+strconv.Itoa(moduleId))
+	rpcClient, err := rpc.DialHTTPPath("tcp", serverAddr, rpc.DefaultRPCPath+strconv.FormatUint(uint64(moduleId), 10))
 	if err != nil {
-		log.Error("NewModuleClient ERROR: can not Dial to server %v, %v", serverAddr, err)
+		log.Error("NewRpcClient ERROR: can not Dial to server %v, %v", serverAddr, err)
 	} else {
-		moduleClient := &module_client.ModuleClient{
+		rpcClient := &rpc_client.RpcClient{
 			RpcClient:  rpcClient,
 			ModuleId:   moduleId,
 			ServerAddr: serverAddr,
 			ServerType: serverType,
 		}
 
-		return moduleClient
+		return rpcClient
 	}
 
 	return nil
 }
 
-func (mgr *RpcMgr) StartRpcServer(rcvr interface{}, serverAddr string, moduleId int) {
+func (mgr *RpcMgr) StartRpcServer(rcvr interface{}, serverAddr string, moduleId uint32) {
 	mgr.ServerAddr = serverAddr
 	server := rpc.NewServer()
 	server.Register(rcvr)
-	server.HandleHTTP(rpc.DefaultRPCPath+strconv.Itoa(moduleId), rpc.DefaultDebugPath+strconv.Itoa(moduleId))
+	server.HandleHTTP(rpc.DefaultRPCPath+strconv.FormatUint(uint64(moduleId), 10), rpc.DefaultDebugPath+strconv.FormatUint(uint64(moduleId), 10))
 
 	log.Debug("Start Server %v, ModuleId:%v, ServerType:%v", serverAddr, moduleId, mgr.ServerType)
 
@@ -64,44 +64,44 @@ func (mgr *RpcMgr) StartRpcServer(rcvr interface{}, serverAddr string, moduleId 
 	go http.Serve(l, nil)
 }
 
-func (mgr *RpcMgr) AddMoudleClient(moduleId int, moduleClient *module_client.ModuleClient) error {
-	_, ok := mgr.ModuleClient[moduleId]
+func (mgr *RpcMgr) AddMoudleClient(moduleId uint32, rpcClient *rpc_client.RpcClient) error {
+	_, ok := mgr.RpcClient[moduleId]
 	if ok {
-		return errors.New("ModuleClient is exist:" + mgr.ModuleClient[moduleId].String())
+		return errors.New("RpcClient is exist:" + mgr.RpcClient[moduleId].String())
 	}
 
-	mgr.ModuleClient[moduleId] = moduleClient
+	mgr.RpcClient[moduleId] = rpcClient
 	return nil
 }
 
-func (mgr *RpcMgr) RemoveMoudleClient(moduleId int) error {
-	_, ok := mgr.ModuleClient[moduleId]
+func (mgr *RpcMgr) RemoveMoudleClient(moduleId uint32) error {
+	_, ok := mgr.RpcClient[moduleId]
 	if !ok {
-		return errors.New("ModuleClient is not exist:" + mgr.ModuleClient[moduleId].String())
+		return errors.New("RpcClient is not exist:" + mgr.RpcClient[moduleId].String())
 	}
 
-	mgr.ModuleClient[moduleId] = nil
+	mgr.RpcClient[moduleId] = nil
 	return nil
 }
 
-func (mgr *RpcMgr) RpcCallByModuleId(moduleId int, method string, req interface{}, resp interface{}) error {
-	moduleClient, ok := mgr.ModuleClient[moduleId]
+func (mgr *RpcMgr) RpcCallByModuleId(moduleId uint32, method string, req interface{}, resp interface{}) error {
+	rpcClient, ok := mgr.RpcClient[moduleId]
 	if !ok {
 		log.Error("can not find Module id = %v", moduleId)
-		return errors.New("can not find Module id = " + strconv.Itoa(moduleId))
+		return errors.New("can not find Module id = " + strconv.FormatUint(uint64(moduleId), 10))
 	}
 
-	if moduleClient.RpcClient == nil {
+	if rpcClient.RpcClient == nil {
 		log.Error("RpcClient is nil, ModuleId = %v", moduleId)
-		return errors.New("RpcClient is nil, ModuleId = " + strconv.Itoa(moduleId))
+		return errors.New("RpcClient is nil, ModuleId = " + strconv.FormatUint(uint64(moduleId), 10))
 	}
 
-	return moduleClient.RpcClient.Call(method, req, resp)
+	return rpcClient.RpcClient.Call(method, req, resp)
 }
 
-func (mgr *RpcMgr) RpcCallByServerType(serverType define.SERVER_TYPE, method string, req interface{}, resp interface{}) {
-	for moduleId, moduleClient := range mgr.ModuleClient {
-		if moduleClient.ServerType == serverType {
+func (mgr *RpcMgr) RpcCallByServerType(serverType pb.SERVER_TYPE, method string, req interface{}, resp interface{}) {
+	for moduleId, rpcClient := range mgr.RpcClient {
+		if rpcClient.ServerType == serverType {
 			err := mgr.RpcCallByModuleId(moduleId, method, req, resp)
 			if err != nil {
 				log.Error("RpcCallByModuleId error: %v", err)
@@ -110,9 +110,9 @@ func (mgr *RpcMgr) RpcCallByServerType(serverType define.SERVER_TYPE, method str
 	}
 }
 
-func (mgr *RpcMgr) RpcCallByServerTypeExcept(serverType define.SERVER_TYPE, exceptModuleId int, method string, req interface{}, resp interface{}) {
-	for moduleId, moduleClient := range mgr.ModuleClient {
-		if moduleClient.ServerType == serverType && moduleClient.ModuleId != exceptModuleId {
+func (mgr *RpcMgr) RpcCallByServerTypeExcept(serverType pb.SERVER_TYPE, exceptModuleId uint32, method string, req interface{}, resp interface{}) {
+	for moduleId, rpcClient := range mgr.RpcClient {
+		if rpcClient.ServerType == serverType && rpcClient.ModuleId != exceptModuleId {
 			err := mgr.RpcCallByModuleId(moduleId, method, req, resp)
 			if err != nil {
 				log.Error("RpcCallByModuleId error: %v", err)
@@ -121,34 +121,23 @@ func (mgr *RpcMgr) RpcCallByServerTypeExcept(serverType define.SERVER_TYPE, exce
 	}
 }
 
-func (mgr *RpcMgr) GetModuleClientByModuleId(moduleId int) *module_client.ModuleClient {
-	moduleClient, ok := mgr.ModuleClient[moduleId]
+func (mgr *RpcMgr) GetRpcClientByModuleId(moduleId uint32) *rpc_client.RpcClient {
+	rpcClient, ok := mgr.RpcClient[moduleId]
 	if !ok {
-		log.Error("can not find ModuleClient moduleId = %v", moduleId)
+		log.Error("can not find RpcClient moduleId = %v", moduleId)
 		return nil
 	}
 
-	return moduleClient
+	return rpcClient
 }
 
-// func (mgr *RpcMgr) GetModuleClientByServerType(serverType define.SERVER_TYPE) map[int]*module_client.ModuleClient {
-// 	moduleClientList := make(map[int]*module_client.ModuleClient)
-// 	for moduleId, moduleClient := range mgr.ModuleClient {
-// 		if moduleClient.ServerType == serverType {
-// 			moduleClientList[moduleId] = moduleClient
-// 		}
-// 	}
-
-// 	return moduleClientList
-// }
-
-func (mgr *RpcMgr) GetModuleClientByServerType(serverType define.SERVER_TYPE) []*module_client.ModuleClient {
-	moduleClientList := []*module_client.ModuleClient{}
-	for _, moduleClient := range mgr.ModuleClient {
-		if moduleClient.ServerType == serverType {
-			moduleClientList = append(moduleClientList, moduleClient)
+func (mgr *RpcMgr) GetRpcClientByServerType(serverType pb.SERVER_TYPE) []*rpc_client.RpcClient {
+	RpcClientList := []*rpc_client.RpcClient{}
+	for _, rpcClient := range mgr.RpcClient {
+		if rpcClient.ServerType == serverType {
+			RpcClientList = append(RpcClientList, rpcClient)
 		}
 	}
 
-	return moduleClientList
+	return RpcClientList
 }

@@ -4,7 +4,7 @@ import (
 	"github.com/name5566/leaf"
 	lconf "github.com/name5566/leaf/conf"
 	"github.com/99SHOU/joyserver/center"
-	"github.com/99SHOU/joyserver/conf"
+	"github.com/99SHOU/joyserver/common/conf"
 	"github.com/99SHOU/joyserver/gate"
 	"github.com/99SHOU/joyserver/logic"
 	"github.com/99SHOU/joyserver/login"

@@ -10,15 +10,16 @@ type RpcHandler struct {
 }
 
 func (handler *RpcHandler) ModulePortReq(req *rpc_struct.ModulePortReq, resp *rpc_struct.ModulPortResp) error {
-	port, err := handler.module.GetModulePort(req.ServerType)
+	rpcPort, port, err := handler.module.GetModulePort(req.ServerType)
 	if err != nil {
 		log.Error("%v", err)
-		resp.Port = 0
+		resp.RpcPort = 0
 		resp.ServerType = req.ServerType
 	}
 
-	log.Debug("ModulePortReq%v   %v", port, req.ServerType.String())
+	log.Debug("RPC_PORT%v, PORT %v, %v", rpcPort, port, req.ServerType.String())
 
+	resp.RpcPort = rpcPort
 	resp.Port = port
 	resp.ServerType = req.ServerType
 

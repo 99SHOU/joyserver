@@ -1,10 +1,11 @@
 package internal
 
 import (
-	"github.com/99SHOU/joyserver/base"
+	"github.com/99SHOU/joyserver/common/base"
 	"github.com/99SHOU/joyserver/common/define"
 	"github.com/99SHOU/joyserver/common/mgr"
-	"github.com/99SHOU/joyserver/common/module_client"
+	"github.com/99SHOU/joyserver/common/pb"
+	"github.com/99SHOU/joyserver/common/rpc_client"
 	"strconv"
 )
 
@@ -15,13 +16,13 @@ type Module struct {
 
 func (m *Module) OnInit() {
 	m.ModuleId = define.MACHINE_MODULE_ID
-	m.ServerType = define.SERVER_TYPE_MACHINE
+	m.ServerType = pb.SERVER_TYPE_MACHINE
 	m.portMgr = new(mgr.PortMgr)
-	m.RpcMgr = &mgr.RpcMgr{ModuleClient: make(map[int]*module_client.ModuleClient), ServerType: m.ServerType}
+	m.RpcMgr = &mgr.RpcMgr{RpcClient: make(map[uint32]*rpc_client.RpcClient), ServerType: m.ServerType}
 	m.RpcHandler = &RpcHandler{module: m}
 
 	m.portMgr.OnInit()
-	m.RpcMgr.StartRpcServer(m.RpcHandler, "127.0.0.1:"+strconv.Itoa(define.MACHINE_PORT), m.ModuleId)
+	m.RpcMgr.StartRpcServer(m.RpcHandler, "127.0.0.1:"+strconv.Itoa(define.MACHINE_RPC_PORT), m.ModuleId)
 }
 
 func (m *Module) OnDestroy() {
@@ -32,6 +33,6 @@ func (m *Module) Run(chan bool) {
 
 }
 
-func (m *Module) GetModulePort(serverType define.SERVER_TYPE) (int, error) {
+func (m *Module) GetModulePort(serverType pb.SERVER_TYPE) (uint32, uint32, error) {
 	return m.portMgr.GetModulePort(serverType)
 }
