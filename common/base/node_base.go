@@ -1,19 +1,19 @@
 package base
 
 import (
-	"github.com/name5566/leaf/log"
-	"net"
 	"github.com/99SHOU/joyserver/common/define"
 	"github.com/99SHOU/joyserver/common/mgr"
 	"github.com/99SHOU/joyserver/common/pb"
 	"github.com/99SHOU/joyserver/common/rpc_struct"
+	"github.com/name5566/leaf/log"
+	"net"
 	"strconv"
 	"strings"
 )
 
-type Module struct {
-	ServerType     pb.SERVER_TYPE
-	ModuleId       uint32
+type Node struct {
+	NodeType       pb.SERVER_TYPE
+	NodeId         uint32
 	RpcPort        uint32
 	Port           uint32
 	MachineModueId uint32
@@ -24,12 +24,12 @@ type Module struct {
 	ServerHandler ServerHandler
 }
 
-func (m *Module) CreateRpcClientToMachine() {
-	machineModule := m.RpcMgr.NewRpcClient(define.MACHINE_RPC_IP_ADDR+":"+strconv.Itoa(define.MACHINE_RPC_PORT), define.MACHINE_MODULE_ID, pb.SERVER_TYPE_MACHINE)
+func (n *Node) CreateRpcClientToMachine() {
+	machineModule := n.RpcMgr.NewRpcClient(define.MACHINE_RPC_IP_ADDR+":"+strconv.Itoa(define.MACHINE_RPC_PORT), define.MACHINE_MODULE_ID, pb.SERVER_TYPE_MACHINE)
 	if machineModule != nil {
-		err := m.RpcMgr.AddMoudleClient(machineModule.ModuleId, machineModule)
+		err := n.RpcMgr.AddMoudleClient(machineModule.ModuleId, machineModule)
 		if err == nil {
-			m.MachineModueId = machineModule.ModuleId
+			n.MachineModueId = machineModule.ModuleId
 		} else {
 			log.Error("%v", err)
 		}
@@ -38,12 +38,12 @@ func (m *Module) CreateRpcClientToMachine() {
 	}
 }
 
-func (m *Module) CreateRpcClientToCenter() {
-	centerModule := m.RpcMgr.NewRpcClient(define.CENTER_RPC_IP_ADDR+":"+strconv.Itoa(define.CENTER_RPC_PORT), define.CENTER_MODULE_ID, pb.SERVER_TYPE_CENTER)
+func (n *Node) CreateRpcClientToCenter() {
+	centerModule := n.RpcMgr.NewRpcClient(define.CENTER_RPC_IP_ADDR+":"+strconv.Itoa(define.CENTER_RPC_PORT), define.CENTER_MODULE_ID, pb.SERVER_TYPE_CENTER)
 	if centerModule != nil {
-		err := m.RpcMgr.AddMoudleClient(centerModule.ModuleId, centerModule)
+		err := n.RpcMgr.AddMoudleClient(centerModule.ModuleId, centerModule)
 		if err == nil {
-			m.CenterModuleId = centerModule.ModuleId
+			n.CenterModuleId = centerModule.ModuleId
 		} else {
 			log.Error("%v", err)
 		}
@@ -52,7 +52,7 @@ func (m *Module) CreateRpcClientToCenter() {
 	}
 }
 
-func (m *Module) RegisterToCenter() bool {
+func (n *Node) RegisterToCenter() bool {
 	IP := ""
 
 	//start get local IP
@@ -66,14 +66,14 @@ func (m *Module) RegisterToCenter() bool {
 	//end get local IP
 
 	req := &rpc_struct.RegisterToCenterReq{
-		ServerType: m.ServerType,
-		ModuleId:   m.ModuleId,
+		ServerType: n.NodeType,
+		ModuleId:   n.NodeId,
 		Ip:         IP,
-		RpcPort:    m.RpcPort,
-		Port:       m.Port,
+		RpcPort:    n.RpcPort,
+		Port:       n.Port,
 	}
 	resp := new(rpc_struct.RegisterToCenterResp)
-	err = m.RpcMgr.RpcCallByModuleId(m.CenterModuleId, "RpcHandler.RegisterToCenter", req, resp)
+	err = n.RpcMgr.RpcCallByModuleId(n.CenterModuleId, "RpcHandler.RegisterToCenter", req, resp)
 	if err != nil {
 		log.Error("RpcCallByModuleId error: %v", err)
 	}
@@ -87,31 +87,31 @@ func (m *Module) RegisterToCenter() bool {
 	return false
 }
 
-func (m *Module) StartRpcServer(rpcHandler interface{}) {
-	m.RpcMgr.StartRpcServer(rpcHandler, "127.0.0.1"+":"+strconv.FormatUint(uint64(m.RpcPort), 10), m.ModuleId)
+func (n *Node) StartRpcServer(rpcHandler interface{}) {
+	n.RpcMgr.StartRpcServer(rpcHandler, "127.0.0.1"+":"+strconv.FormatUint(uint64(n.RpcPort), 10), n.NodeId)
 }
 
-func (m *Module) ModuleIdReq() {
+func (n *Node) ModuleIdReq() {
 	req := &rpc_struct.ModuleIdReq{
-		ServerType: m.ServerType,
+		ServerType: n.NodeType,
 	}
 	resp := new(rpc_struct.ModuleIdResp)
-	m.RpcMgr.RpcCallByModuleId(m.CenterModuleId, "RpcHandler.ModuleIdReq", req, resp)
+	n.RpcMgr.RpcCallByModuleId(n.CenterModuleId, "RpcHandler.ModuleIdReq", req, resp)
 
 	if resp.ModuleId != 0 {
-		m.ModuleId = resp.ModuleId
+		n.NodeId = resp.ModuleId
 	}
 }
 
-func (m *Module) ModulePortReq() {
+func (n *Node) ModulePortReq() {
 	req := &rpc_struct.ModulePortReq{
-		ServerType: m.ServerType,
+		ServerType: n.NodeType,
 	}
 	resp := new(rpc_struct.ModulPortResp)
-	m.RpcMgr.RpcCallByModuleId(m.MachineModueId, "RpcHandler.ModulePortReq", req, resp)
+	n.RpcMgr.RpcCallByModuleId(n.MachineModueId, "RpcHandler.ModulePortReq", req, resp)
 
 	if resp.RpcPort != 0 {
-		m.RpcPort = resp.RpcPort
-		m.Port = resp.Port
+		n.RpcPort = resp.RpcPort
+		n.Port = resp.Port
 	}
 }

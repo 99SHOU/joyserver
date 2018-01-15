@@ -5,12 +5,12 @@ import (
 	"github.com/name5566/leaf"
 	"github.com/name5566/leaf/log"
 	lconf "github.com/name5566/leaf/conf"
-	"github.com/99SHOU/joyserver/center"
+	"github.com/99SHOU/joyserver/nodes/center"
 	"github.com/99SHOU/joyserver/common/conf"
-	"github.com/99SHOU/joyserver/gate"
-	"github.com/99SHOU/joyserver/logic"
-	"github.com/99SHOU/joyserver/login"
-	"github.com/99SHOU/joyserver/machine"
+	"github.com/99SHOU/joyserver/nodes/gate"
+	"github.com/99SHOU/joyserver/nodes/logic"
+	"github.com/99SHOU/joyserver/nodes/login"
+	"github.com/99SHOU/joyserver/nodes/machine"
 )
 
 func main() {

@@ -10,19 +10,19 @@ import (
 )
 
 type Module struct {
-	base.Module
+	base.Node
 	portMgr *mgr.PortMgr
 }
 
 func (m *Module) OnInit() {
-	m.ModuleId = define.MACHINE_MODULE_ID
-	m.ServerType = pb.SERVER_TYPE_MACHINE
+	m.NodeId = define.MACHINE_MODULE_ID
+	m.NodeType = pb.SERVER_TYPE_MACHINE
 	m.portMgr = new(mgr.PortMgr)
-	m.RpcMgr = &mgr.RpcMgr{RpcClient: make(map[uint32]*rpc_client.RpcClient), ServerType: m.ServerType}
+	m.RpcMgr = &mgr.RpcMgr{RpcClient: make(map[uint32]*rpc_client.RpcClient), ServerType: m.NodeType}
 	m.RpcHandler = &RpcHandler{module: m}
 
 	m.portMgr.OnInit()
-	m.RpcMgr.StartRpcServer(m.RpcHandler, "127.0.0.1:"+strconv.Itoa(define.MACHINE_RPC_PORT), m.ModuleId)
+	m.RpcMgr.StartRpcServer(m.RpcHandler, "127.0.0.1:"+strconv.Itoa(define.MACHINE_RPC_PORT), m.NodeId)
 }
 
 func (m *Module) OnDestroy() {

@@ -1,7 +1,7 @@
 package logic
 
 import (
-	"github.com/99SHOU/joyserver/logic/internal"
+	"github.com/99SHOU/joyserver/nodes/logic/internal"
 )
 
 var (

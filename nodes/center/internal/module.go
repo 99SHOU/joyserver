@@ -11,17 +11,17 @@ import (
 )
 
 type Module struct {
-	base.Module
+	base.Node
 	moduleIdMgr      *mgr.ModuleIdMgr
 	accountVerifyMgr *AccountVerifyMgr
 }
 
 func (m *Module) OnInit() {
-	m.ServerType = pb.SERVER_TYPE_CENTER
+	m.NodeType = pb.SERVER_TYPE_CENTER
 	m.moduleIdMgr = &mgr.ModuleIdMgr{StartId: define.CENTER_MODULE_ID}
-	m.ModuleId = define.CENTER_MODULE_ID
+	m.NodeId = define.CENTER_MODULE_ID
 	m.RpcPort = define.CENTER_RPC_PORT
-	m.RpcMgr = &mgr.RpcMgr{RpcClient: make(map[uint32]*rpc_client.RpcClient), ServerType: m.ServerType}
+	m.RpcMgr = &mgr.RpcMgr{RpcClient: make(map[uint32]*rpc_client.RpcClient), ServerType: m.NodeType}
 	m.RpcHandler = &RpcHandler{module: m}
 
 	db := mysql.Open(define.MYSQL_DNS)
