@@ -1,22 +1,22 @@
 package internal
 
 import (
+	"github.com/99SHOU/joyserver/common/net"
 	"github.com/name5566/leaf/log"
-	"github.com/99SHOU/joyserver/common/base"
 )
 
 type AgentMgr struct {
-	agentList map[string]*base.Agent
+	agentList map[string]*net.ServerAgent
 }
 
 func NewAgentMgr() *AgentMgr {
 	agentMgr := &AgentMgr{}
-	agentMgr.agentList = make(map[string]*base.Agent)
+	agentMgr.agentList = make(map[string]*net.ServerAgent)
 
 	return agentMgr
 }
 
-func (am *AgentMgr) AddAgent(account string, agent *base.Agent) bool {
+func (am *AgentMgr) AddAgent(account string, agent *net.ServerAgent) bool {
 	_, ok := am.agentList[account]
 	if ok {
 		log.Error("Account %v is exist a agent", account)

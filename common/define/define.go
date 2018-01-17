@@ -13,13 +13,11 @@ const (
 	//should write to conf file end
 
 	//machine define start
-	MACHINE_MODULE_ID = 1
-	MACHINE_RPC_PORT  = 20000
+	MACHINE_RPC_PORT = 20000
 	//machine define end
 
 	//center define start
-	CENTER_MODULE_ID = 2
-	CENTER_RPC_PORT  = 21000
+	CENTER_RPC_PORT = 21000
 	//center define end
 
 	//rpc port define start

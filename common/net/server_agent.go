@@ -1,4 +1,4 @@
-package base
+package net
 
 import (
 	"github.com/name5566/leaf/log"
@@ -7,13 +7,13 @@ import (
 	"reflect"
 )
 
-type Agent struct {
+type ServerAgent struct {
 	conn     network.Conn
 	server   *Server
 	userData interface{}
 }
 
-func (a *Agent) Run() {
+func (a *ServerAgent) Run() {
 	for {
 		data, err := a.conn.ReadMsg()
 		if err != nil {
@@ -35,11 +35,11 @@ func (a *Agent) Run() {
 	}
 }
 
-func (a *Agent) OnClose() {
+func (a *ServerAgent) OnClose() {
 	a.server.OnCloseAgent(a)
 }
 
-func (a *Agent) WriteMsg(msg interface{}) {
+func (a *ServerAgent) WriteMsg(msg interface{}) {
 	if a.server.Processor != nil {
 		data, err := a.server.Processor.Marshal(msg)
 		if err != nil {
@@ -53,26 +53,26 @@ func (a *Agent) WriteMsg(msg interface{}) {
 	}
 }
 
-func (a *Agent) LocalAddr() net.Addr {
+func (a *ServerAgent) LocalAddr() net.Addr {
 	return a.conn.LocalAddr()
 }
 
-func (a *Agent) RemoteAddr() net.Addr {
+func (a *ServerAgent) RemoteAddr() net.Addr {
 	return a.conn.RemoteAddr()
 }
 
-func (a *Agent) Close() {
+func (a *ServerAgent) Close() {
 	a.conn.Close()
 }
 
-func (a *Agent) Destroy() {
+func (a *ServerAgent) Destroy() {
 	a.conn.Destroy()
 }
 
-func (a *Agent) UserData() interface{} {
+func (a *ServerAgent) UserData() interface{} {
 	return a.userData
 }
 
-func (a *Agent) SetUserData(data interface{}) {
+func (a *ServerAgent) SetUserData(data interface{}) {
 	a.userData = data
 }

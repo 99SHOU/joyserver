@@ -5,5 +5,5 @@ import (
 )
 
 var (
-	Module = new(internal.Module)
+	Node = new(internal.Node)
 )

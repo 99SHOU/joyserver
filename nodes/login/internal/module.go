@@ -1,43 +1,27 @@
 package internal
 
 import (
-	"github.com/99SHOU/joyserver/common/pb"
-	//"github.com/name5566/leaf/log"
 	"github.com/99SHOU/joyserver/common/base"
-	//"github.com/99SHOU/joyserver/common/define"
-	"github.com/99SHOU/joyserver/common/mgr"
-	"github.com/99SHOU/joyserver/common/rpc_client"
-	"strconv"
+	"github.com/99SHOU/joyserver/common/msg"
+	"github.com/99SHOU/joyserver/common/net"
+	"github.com/99SHOU/joyserver/common/pb"
 )
 
-type Module struct {
+type Node struct {
 	base.Node
-	*base.Server
 }
 
-func (m *Module) OnInit() {
-	m.NodeType = pb.SERVER_TYPE_LOGIN
-	m.RpcMgr = &mgr.RpcMgr{RpcClient: make(map[uint32]*rpc_client.RpcClient), ServerType: m.NodeType}
-	m.RpcHandler = &RpcHandler{module: m}
-	m.ServerHandler = &ServerHandler{module: m}
+func (n *Node) OnInit() {
+	n.NodeType = pb.SERVER_TYPE_LOGIN
+	n.NodeID = n.NodeCfg.NodeID
 
-	m.CreateRpcClientToMachine()
-	m.CreateRpcClientToCenter()
-	m.ModuleIdReq()
-	m.ModulePortReq()
-	m.StartRpcServer(m.RpcHandler)
-	m.Server = base.NewServer("127.0.0.1" + ":" + strconv.FormatUint(uint64(m.Port), 10))
-	m.ServerHandler.Init(m.Server)
-
+	n.Server = net.NewServer(n.NodeCfg.Port, &MessageHandler{Node: n}, msg.Processor)
 }
 
-func (m *Module) OnDestroy() {
+func (n *Node) OnDestroy() {
 }
 
-func (m *Module) Run(chan bool) {
-	m.Server.Start()
+func (n *Node) Run(chan bool) {
+	n.Server.Start()
 
-	if m.RegisterToCenter() == true {
-		//log.Error("Connect to Center Error")
-	}
 }
