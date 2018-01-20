@@ -2,6 +2,10 @@ package net
 
 import ()
 
-type MessageHandler interface {
+type ServerHandler interface {
 	Register(server Server)
+}
+
+type ClientHandler interface {
+	Register(client Client)
 }

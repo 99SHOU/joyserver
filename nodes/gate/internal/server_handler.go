@@ -10,24 +10,24 @@ import (
 	"time"
 )
 
-type MessageHandler struct {
+type ServerHandler struct {
 	Node *Node
 }
 
-func (handler *MessageHandler) Register(server net.Server) {
+func (handler *ServerHandler) Register(server net.Server) {
 	server.OnNewAgent = handler.NewAgent
 	server.OnCloseAgent = handler.CloseAgent
 }
 
-func (handler *MessageHandler) NewAgent(agent *net.ServerAgent) {
+func (handler *ServerHandler) NewAgent(agent *net.ServerAgent) {
 }
 
-func (handler *MessageHandler) CloseAgent(agent *net.ServerAgent) {
+func (handler *ServerHandler) CloseAgent(agent *net.ServerAgent) {
 }
 
-func (handler *MessageHandler) onConnectToGateReq(message interface{}, agent interface{}) {
+func (handler *ServerHandler) onConnectToGateReq(message interface{}, agent interface{}) {
 	m := message.(*pb.ConnectToGateReq)
-	a := agent.(*net.ServerAgent)
+	a := agent.(*net.BaseAgent)
 
 	tokenInfo := strings.Split(m.Token, "#")
 	timeStamp, err := strconv.ParseInt(tokenInfo[2], 10, 64)

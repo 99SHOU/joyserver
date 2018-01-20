@@ -6,17 +6,17 @@ import (
 )
 
 type AgentMgr struct {
-	agentList map[string]*net.ServerAgent
+	agentList map[string]*net.BaseAgent
 }
 
 func NewAgentMgr() *AgentMgr {
 	agentMgr := &AgentMgr{}
-	agentMgr.agentList = make(map[string]*net.ServerAgent)
+	agentMgr.agentList = make(map[string]*net.BaseAgent)
 
 	return agentMgr
 }
 
-func (am *AgentMgr) AddAgent(account string, agent *net.ServerAgent) bool {
+func (am *AgentMgr) AddAgent(account string, agent *net.BaseAgent) bool {
 	_, ok := am.agentList[account]
 	if ok {
 		log.Error("Account %v is exist a agent", account)

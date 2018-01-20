@@ -13,16 +13,20 @@ type Node struct {
 }
 
 func (n *Node) OnInit() {
-	n.NodeType = pb.SERVER_TYPE_LOGIC
+	n.NodeType = pb.NODE_TYPE_GATE
 	n.NodeID = n.NodeCfg.NodeID
 
-	n.Server = net.NewServer(n.NodeCfg.Port, &MessageHandler{Node: n}, msg.Processor)
+	n.Server = net.NewServer(n.NodeCfg.Port, &ServerHandler{Node: n}, msg.Processor)
 }
 
 func (n *Node) OnDestroy() {
-
+	n.Server.Close()
 }
 
 func (n *Node) Run(chan bool) {
 	n.Server.Start()
+
+	for {
+
+	}
 }

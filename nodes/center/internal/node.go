@@ -1,6 +1,7 @@
 package internal
 
 import (
+	"database/sql"
 	"github.com/99SHOU/joyserver/common/base"
 	"github.com/99SHOU/joyserver/common/db/mysql"
 	"github.com/99SHOU/joyserver/common/define"
@@ -12,23 +13,30 @@ import (
 type Node struct {
 	base.Node
 	accountVerifyMgr *AccountVerifyMgr
+	db               *sql.DB
 }
 
 func (n *Node) OnInit() {
-	n.NodeType = pb.SERVER_TYPE_CENTER
+	n.NodeType = pb.NODE_TYPE_CENTER
 	n.NodeID = n.NodeCfg.NodeID
 
-	db := mysql.Open(define.MYSQL_DNS)
-	n.accountVerifyMgr = &AccountVerifyMgr{db: db}
-	n.accountVerifyMgr.Init()
+	n.db = mysql.Open(define.MYSQL_DNS)
 
-	n.Server = net.NewServer(n.NodeCfg.Port, &MessageHandler{Node: n}, msg.Processor)
+	n.accountVerifyMgr = &AccountVerifyMgr{db: n.db}
+	n.accountVerifyMgr.Init()
+	n.Server = net.NewServer(n.NodeCfg.Port, &ServerHandler{Node: n}, msg.Processor)
 }
 
 func (n *Node) OnDestroy() {
+	n.Server.Close()
 	n.accountVerifyMgr.Destroy()
+
 }
 
 func (n *Node) Run(chan bool) {
 	n.Server.Start()
+
+	for {
+
+	}
 }

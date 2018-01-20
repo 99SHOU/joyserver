@@ -14,7 +14,7 @@ type NodeConfig struct {
 }
 
 type Node struct {
-	NodeType pb.SERVER_TYPE
+	NodeType pb.NODE_TYPE
 	NodeID   NodeID
 	NodeCfg  NodeConfig
 	Server   net.Server

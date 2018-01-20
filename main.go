@@ -5,8 +5,8 @@ import (
 	"github.com/99SHOU/joyserver/common/base"
 	"github.com/99SHOU/joyserver/common/conf"
 	"github.com/99SHOU/joyserver/nodes/center"
+	game "github.com/99SHOU/joyserver/nodes/game"
 	"github.com/99SHOU/joyserver/nodes/gate"
-	"github.com/99SHOU/joyserver/nodes/logic"
 	"github.com/99SHOU/joyserver/nodes/login"
 	"github.com/99SHOU/joyserver/nodes/machine"
 	"github.com/name5566/leaf"
@@ -32,14 +32,14 @@ func main() {
 		machine.Node.NodeCfg = base.NodeConfig{NodeID: 0, CenterAddr: "127.0.0.1", Port: 2000}
 		center.Node.NodeCfg = base.NodeConfig{NodeID: 1, CenterAddr: "127.0.0.1", Port: 2001}
 		gate.Node.NodeCfg = base.NodeConfig{NodeID: 2, CenterAddr: "127.0.0.1", Port: 2002}
-		logic.Node.NodeCfg = base.NodeConfig{NodeID: 3, CenterAddr: "127.0.0.1", Port: 2003}
+		game.Node.NodeCfg = base.NodeConfig{NodeID: 3, CenterAddr: "127.0.0.1", Port: 2003}
 		login.Node.NodeCfg = base.NodeConfig{NodeID: 4, CenterAddr: "127.0.0.1", Port: 2004}
 
 		leaf.Run(
 			machine.Node,
 			center.Node,
 			gate.Node,
-			logic.Node,
+			game.Node,
 			login.Node,
 		)
 	} else {
@@ -53,9 +53,9 @@ func main() {
 		case "gate":
 			gate.Node.NodeCfg = nodeCfg
 			leaf.Run(gate.Node)
-		case "logic":
-			logic.Node.NodeCfg = nodeCfg
-			leaf.Run(logic.Node)
+		case "game":
+			game.Node.NodeCfg = nodeCfg
+			leaf.Run(game.Node)
 		case "login":
 			login.Node.NodeCfg = nodeCfg
 			leaf.Run(login.Node)

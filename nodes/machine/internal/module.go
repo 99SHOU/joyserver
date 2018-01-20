@@ -15,7 +15,7 @@ type Node struct {
 }
 
 func (n *Node) OnInit() {
-	n.NodeType = pb.SERVER_TYPE_MACHINE
+	n.NodeType = pb.NODE_TYPE_MACHINE
 	n.NodeID = n.NodeCfg.NodeID
 
 }

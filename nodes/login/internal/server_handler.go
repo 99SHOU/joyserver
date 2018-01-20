@@ -6,25 +6,25 @@ import (
 	"github.com/99SHOU/joyserver/common/pb"
 )
 
-type MessageHandler struct {
+type ServerHandler struct {
 	Node *Node
 }
 
-func (handler *MessageHandler) Register(server net.Server) {
+func (handler *ServerHandler) Register(server net.Server) {
 	server.OnNewAgent = handler.NewAgent
 	server.OnCloseAgent = handler.CloseAgent
 
 }
 
-func (handler *MessageHandler) NewAgent(agent *net.ServerAgent) {
+func (handler *ServerHandler) NewAgent(agent *net.ServerAgent) {
 }
 
-func (handler *MessageHandler) CloseAgent(agent *net.ServerAgent) {
+func (handler *ServerHandler) CloseAgent(agent *net.ServerAgent) {
 }
 
-func (handler *MessageHandler) onLoginReq(message interface{}, agent interface{}) {
+func (handler *ServerHandler) onLoginReq(message interface{}, agent interface{}) {
 	msg := message.(*pb.LoginReq)
-	a := agent.(*net.ServerAgent)
+	a := agent.(*net.BaseAgent)
 
 	token := ""
 	gateAddr := ""
