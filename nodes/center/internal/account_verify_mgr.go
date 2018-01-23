@@ -4,19 +4,23 @@ import (
 	"database/sql"
 )
 
-type AccountVerifyMgr struct {
+type AccountVerifyManager struct {
 	db *sql.DB
 }
 
-func (avm *AccountVerifyMgr) Init() {
+func (avm *AccountVerifyManager) Init() {
 
 }
 
-func (avm *AccountVerifyMgr) Destroy() {
+func (avm *AccountVerifyManager) Destroy() {
 	avm.db.Close()
 }
 
-func (avm *AccountVerifyMgr) VarifyAccount(account string) (bool, error) {
+func (avm *AccountVerifyManager) Run() {
+
+}
+
+func (avm *AccountVerifyManager) VarifyAccount(account string) (bool, error) {
 	stmtOut, err := avm.db.Prepare("SELECT account FROM account WHERE account = ?")
 	if err != nil {
 		return false, err

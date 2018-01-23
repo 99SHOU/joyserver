@@ -24,6 +24,6 @@ func (n *Node) OnDestroy() {
 
 }
 
-func (n *Node) Run(chan bool) {
+func (n *Node) Run(closeSig chan bool) {
 
 }

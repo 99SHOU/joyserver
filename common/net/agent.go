@@ -1,6 +1,7 @@
 package net
 
 import (
+	"github.com/99SHOU/joyserver/common/define"
 	"github.com/99SHOU/joyserver/common/pb"
 	"github.com/name5566/leaf/log"
 	"github.com/name5566/leaf/network"
@@ -18,6 +19,8 @@ type Agent interface {
 
 	GetNodeType() pb.NODE_TYPE
 	SetNodeType(nodeType pb.NODE_TYPE)
+	GetNodeID() define.NodeID
+	SetNodeID(nodeID define.NodeID)
 	GetAgentInfo(key interface{}) interface{}
 	SetAgentInfo(key interface{}, value interface{})
 }
@@ -111,6 +114,13 @@ func (a *BaseAgent) SetNodeType(nodeType pb.NODE_TYPE) {
 	a.agentInfo.NodeType = nodeType
 }
 
+func (a *BaseAgent) GetNodeID() define.NodeID {
+	return a.agentInfo.NodeID
+}
+
+func (a *BaseAgent) SetNodeID(nodeID define.NodeID) {
+	a.agentInfo.NodeID = nodeID
+}
 func (a *BaseAgent) GetAgentInfo(key interface{}) interface{} {
 	return a.GetAgentInfo(key)
 }

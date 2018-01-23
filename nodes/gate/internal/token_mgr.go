@@ -8,11 +8,12 @@ type TokenMgr struct {
 	tokenList map[string]string
 }
 
-func NewTokenMgr() *TokenMgr {
-	tokenMgr := &TokenMgr{}
-	tokenMgr.tokenList = make(map[string]string)
+func (tm *TokenMgr) Init() {
+	tm.tokenList = make(map[string]string)
+}
 
-	return tokenMgr
+func (tm *TokenMgr) Destroy() {
+
 }
 
 func (tm *TokenMgr) AddTokenInfo(account string, token string) bool {

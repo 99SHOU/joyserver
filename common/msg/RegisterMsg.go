@@ -15,5 +15,6 @@ func init() {
 
 // all of msg must register in this func
 func RegisterMsg(processor *net.Processor) {
-	processor.Register(uint16(pb.EGameMsgID_EGMI_CONNECT_TO_GATE_REQ), pb.ConnectToGateReq{})
+	processor.Register(uint16(pb.MsgID_FWM_NODE_REGISTER_REQ), &pb.NodeRegisterReq{})
+	processor.Register(uint16(pb.MsgID_FWM_NODE_REGISTER_ACK), &pb.NodeRegisterAck{})
 }

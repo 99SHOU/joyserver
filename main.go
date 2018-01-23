@@ -4,6 +4,7 @@ import (
 	"flag"
 	"github.com/99SHOU/joyserver/common/base"
 	"github.com/99SHOU/joyserver/common/conf"
+	"github.com/99SHOU/joyserver/common/define"
 	"github.com/99SHOU/joyserver/nodes/center"
 	game "github.com/99SHOU/joyserver/nodes/game"
 	"github.com/99SHOU/joyserver/nodes/gate"
@@ -26,20 +27,20 @@ func main() {
 	centerAddr := flag.String("center", "", "")
 	port := flag.Uint("port", 0, "")
 
-	nodeCfg := base.NodeConfig{NodeID: base.NodeID(*nodeID), CenterAddr: *centerAddr, Port: *port}
+	nodeCfg := base.NodeConfig{NodeID: define.NodeID(*nodeID), CenterAddr: *centerAddr, Port: *port}
 
 	if *server == "error" {
-		machine.Node.NodeCfg = base.NodeConfig{NodeID: 0, CenterAddr: "127.0.0.1", Port: 2000}
+		machine.Node.NodeCfg = base.NodeConfig{NodeID: 0, CenterAddr: "127.0.0.1:2001", Port: 2000}
 		center.Node.NodeCfg = base.NodeConfig{NodeID: 1, CenterAddr: "127.0.0.1", Port: 2001}
-		gate.Node.NodeCfg = base.NodeConfig{NodeID: 2, CenterAddr: "127.0.0.1", Port: 2002}
-		game.Node.NodeCfg = base.NodeConfig{NodeID: 3, CenterAddr: "127.0.0.1", Port: 2003}
-		login.Node.NodeCfg = base.NodeConfig{NodeID: 4, CenterAddr: "127.0.0.1", Port: 2004}
+		game.Node.NodeCfg = base.NodeConfig{NodeID: 2, CenterAddr: "127.0.0.1:2001", Port: 2002}
+		gate.Node.NodeCfg = base.NodeConfig{NodeID: 3, CenterAddr: "127.0.0.1:2001", Port: 2003}
+		login.Node.NodeCfg = base.NodeConfig{NodeID: 4, CenterAddr: "127.0.0.1:2001", Port: 2004}
 
 		leaf.Run(
 			machine.Node,
 			center.Node,
-			gate.Node,
 			game.Node,
+			gate.Node,
 			login.Node,
 		)
 	} else {

@@ -23,7 +23,7 @@ func NewServer(port uint, serverHandler ServerHandler, processor *Processor) Ser
 	}
 
 	server.Processor.SetByteOrder(server.LittleEndian)
-	serverHandler.Register(server)
+	serverHandler.Register(&server)
 
 	return server
 }
@@ -45,7 +45,7 @@ type Server struct {
 	OnCloseAgent func(*ServerAgent)
 }
 
-func (server *Server) SetHandler(id pb.EGameMsgID, handler MsgHandler) {
+func (server *Server) SetHandler(id pb.MsgID, handler MsgHandler) {
 	server.Processor.SetHandler(uint16(id), handler)
 }
 
@@ -67,6 +67,15 @@ func (server *Server) Start() {
 		tcpServer.NewAgent = func(conn *network.TCPConn) network.Agent {
 			a := &ServerAgent{Server: server, onCloseAgent: server.OnCloseAgent, BaseAgent: BaseAgent{conn: conn, processor: server.Processor, agentInfo: NewAgentInfo()}}
 			server.Agent = a
+
+			if server.OnNewAgent == nil {
+				log.Error("Must set OnNewAgent")
+			}
+
+			if a == nil {
+				log.Error("Agent is nil")
+			}
+
 			server.OnNewAgent(a)
 			return a
 		}

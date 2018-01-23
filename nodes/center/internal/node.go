@@ -8,35 +8,49 @@ import (
 	"github.com/99SHOU/joyserver/common/msg"
 	"github.com/99SHOU/joyserver/common/net"
 	"github.com/99SHOU/joyserver/common/pb"
+	"github.com/99SHOU/joyserver/modules"
 )
 
 type Node struct {
 	base.Node
-	accountVerifyMgr *AccountVerifyMgr
-	db               *sql.DB
+	AgentManager         modules.AgentManager
+	AccountVerifyManager AccountVerifyManager
+	db                   *sql.DB
 }
 
 func (n *Node) OnInit() {
 	n.NodeType = pb.NODE_TYPE_CENTER
 	n.NodeID = n.NodeCfg.NodeID
 
+	// node模块初始化
+	n.AgentManager = modules.AgentManager{}
+	n.AccountVerifyManager = AccountVerifyManager{db: n.db}
+	n.AgentManager.Init()
+	n.AccountVerifyManager.Init()
+
 	n.db = mysql.Open(define.MYSQL_DNS)
 
-	n.accountVerifyMgr = &AccountVerifyMgr{db: n.db}
-	n.accountVerifyMgr.Init()
+	// 启动服务
 	n.Server = net.NewServer(n.NodeCfg.Port, &ServerHandler{Node: n}, msg.Processor)
+	n.Server.Start()
 }
 
 func (n *Node) OnDestroy() {
+	// 关闭服务
 	n.Server.Close()
-	n.accountVerifyMgr.Destroy()
 
+	// node模块销毁
+	n.AgentManager.Destroy()
 }
 
-func (n *Node) Run(chan bool) {
-	n.Server.Start()
+func (n *Node) Run(closeSig chan bool) {
 
 	for {
+		n.AgentManager.Run()
+		n.AccountVerifyManager.Run()
 
+		if <-closeSig {
+			break
+		}
 	}
 }

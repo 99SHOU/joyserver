@@ -1,6 +1,7 @@
 package net
 
 import (
+	"github.com/99SHOU/joyserver/common/define"
 	"github.com/99SHOU/joyserver/common/pb"
 )
 
@@ -13,6 +14,7 @@ func NewAgentInfo() *AgentInfo {
 
 type AgentInfo struct {
 	NodeType pb.NODE_TYPE
+	NodeID   define.NodeID
 	userData map[interface{}]interface{}
 }
 

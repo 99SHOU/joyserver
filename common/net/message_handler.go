@@ -3,9 +3,9 @@ package net
 import ()
 
 type ServerHandler interface {
-	Register(server Server)
+	Register(server *Server)
 }
 
 type ClientHandler interface {
-	Register(client Client)
+	Register(client *Client)
 }

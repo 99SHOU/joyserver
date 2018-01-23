@@ -8,14 +8,14 @@ type ServerHandler struct {
 	Node *Node
 }
 
-func (handler *ServerHandler) Register(server net.Server) {
-	server.OnNewAgent = handler.NewAgent
-	server.OnCloseAgent = handler.CloseAgent
+func (sh *ServerHandler) Register(server *net.Server) {
+	server.OnNewAgent = sh.NewAgent
+	server.OnCloseAgent = sh.CloseAgent
 
 }
 
-func (handler *ServerHandler) NewAgent(agent *net.ServerAgent) {
+func (sh *ServerHandler) NewAgent(agent *net.ServerAgent) {
 }
 
-func (handler *ServerHandler) CloseAgent(agent *net.ServerAgent) {
+func (sh *ServerHandler) CloseAgent(agent *net.ServerAgent) {
 }

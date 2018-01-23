@@ -8,7 +8,7 @@ import (
 	"time"
 )
 
-func NewCLient(addr string, clientHandler ClientHandler, processor *Processor, nodeType pb.NODE_TYPE) Client {
+func NewClient(addr string, clientHandler ClientHandler, processor *Processor) Client {
 	client := Client{
 		Addr:            addr,
 		ConnNum:         1,
@@ -22,10 +22,8 @@ func NewCLient(addr string, clientHandler ClientHandler, processor *Processor, n
 		AgentInfo:       NewAgentInfo(),
 	}
 
-	client.AgentInfo.NodeType = nodeType
-
 	client.Processor.SetByteOrder(client.LittleEndian)
-	clientHandler.Register(client)
+	clientHandler.Register(&client)
 
 	return client
 }
@@ -50,7 +48,7 @@ type Client struct {
 	OnCloseAgent func(*ClientAgent)
 }
 
-func (client *Client) SetHandler(id pb.EGameMsgID, handler MsgHandler) {
+func (client *Client) SetHandler(id pb.MsgID, handler MsgHandler) {
 	client.Processor.SetHandler(uint16(id), handler)
 }
 
@@ -74,6 +72,15 @@ func (client *Client) Start() {
 		tcpClient.NewAgent = func(conn *network.TCPConn) network.Agent {
 			a := &ClientAgent{Client: client, onCloseAgent: client.OnCloseAgent, BaseAgent: BaseAgent{conn: conn, processor: client.Processor, agentInfo: client.AgentInfo}}
 			client.Agent = a
+
+			if client.OnNewAgent == nil {
+				log.Error("Must set OnNewAgent")
+			}
+
+			if a == nil {
+				log.Error("Agent is nil")
+			}
+
 			client.OnNewAgent(a)
 			return a
 		}
