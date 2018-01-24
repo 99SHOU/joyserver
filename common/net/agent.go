@@ -25,33 +25,12 @@ type Agent interface {
 	SetAgentInfo(key interface{}, value interface{})
 }
 
-// ClientAgent
-type ClientAgent struct {
-	BaseAgent
-	Client       *Client
-	onCloseAgent func(*ClientAgent)
-}
-
-func (a *ClientAgent) OnClose() {
-	a.onCloseAgent(a)
-}
-
-// ServerAgent
-type ServerAgent struct {
-	BaseAgent
-	Server       *Server
-	onCloseAgent func(*ServerAgent)
-}
-
-func (a *ServerAgent) OnClose() {
-	a.onCloseAgent(a)
-}
-
 // BaseAgent
 type BaseAgent struct {
-	conn      network.Conn
-	processor *Processor
-	agentInfo *AgentInfo
+	conn         network.Conn
+	processor    *Processor
+	agentInfo    *AgentInfo
+	onCloseAgent func(Agent)
 }
 
 func (a *BaseAgent) Run() {
@@ -74,6 +53,10 @@ func (a *BaseAgent) Run() {
 			a.processor.Dispatch(msg, a)
 		}
 	}
+}
+
+func (a *BaseAgent) OnClose() {
+	a.onCloseAgent(a)
 }
 
 func (a *BaseAgent) WriteMsg(msg interface{}) {

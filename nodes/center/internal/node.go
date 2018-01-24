@@ -11,6 +11,14 @@ import (
 	"github.com/99SHOU/joyserver/modules"
 )
 
+var (
+	processor = net.NewProcessor()
+)
+
+func init() {
+	msg.RegisterMsg(processor)
+}
+
 type Node struct {
 	base.Node
 	AgentManager         modules.AgentManager
@@ -31,7 +39,7 @@ func (n *Node) OnInit() {
 	n.db = mysql.Open(define.MYSQL_DNS)
 
 	// 启动服务
-	n.Server = net.NewServer(n.NodeCfg.Port, &ServerHandler{Node: n}, msg.Processor)
+	n.Server = net.NewServer(n.NodeCfg.Port, &ServerHandler{Node: n}, processor)
 	n.Server.Start()
 }
 

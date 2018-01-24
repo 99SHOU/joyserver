@@ -41,11 +41,11 @@ type Client struct {
 	Processor       *Processor
 
 	TcpClient *network.TCPClient
-	Agent     *ClientAgent
+	Agent     *BaseAgent
 	AgentInfo *AgentInfo
 
-	OnNewAgent   func(*ClientAgent)
-	OnCloseAgent func(*ClientAgent)
+	OnNewAgent   func(Agent)
+	OnCloseAgent func(Agent)
 }
 
 func (client *Client) SetHandler(id pb.MsgID, handler MsgHandler) {
@@ -70,19 +70,15 @@ func (client *Client) Start() {
 		tcpClient.MaxMsgLen = client.MaxMsgLen
 		tcpClient.LittleEndian = client.LittleEndian
 		tcpClient.NewAgent = func(conn *network.TCPConn) network.Agent {
-			a := &ClientAgent{Client: client, onCloseAgent: client.OnCloseAgent, BaseAgent: BaseAgent{conn: conn, processor: client.Processor, agentInfo: client.AgentInfo}}
-			client.Agent = a
+			client.Agent = new(BaseAgent)
+			client.Agent.onCloseAgent = client.OnCloseAgent
+			client.Agent.conn = conn
+			client.Agent.processor = client.Processor
+			client.Agent.agentInfo = client.AgentInfo
 
-			if client.OnNewAgent == nil {
-				log.Error("Must set OnNewAgent")
-			}
+			client.OnNewAgent(client.Agent)
 
-			if a == nil {
-				log.Error("Agent is nil")
-			}
-
-			client.OnNewAgent(a)
-			return a
+			return client.Agent
 		}
 	}
 

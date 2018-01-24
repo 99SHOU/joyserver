@@ -6,8 +6,15 @@ import (
 	"github.com/99SHOU/joyserver/common/net"
 	"github.com/99SHOU/joyserver/common/pb"
 	"github.com/99SHOU/joyserver/modules"
-	"github.com/name5566/leaf/log"
 )
+
+var (
+	processor = net.NewProcessor()
+)
+
+func init() {
+	msg.RegisterMsg(processor)
+}
 
 type Node struct {
 	base.Node
@@ -27,15 +34,11 @@ func (n *Node) OnInit() {
 	n.ClientManager.Init()
 
 	// 启动服务
-	n.Server = net.NewServer(n.NodeCfg.Port, &ServerHandler{Node: n}, msg.Processor)
+	n.Server = net.NewServer(n.NodeCfg.Port, &ServerHandler{Node: n}, processor)
 	n.Server.Start()
-
-	log.Debug("OnInit")
 }
 
 func (n *Node) OnDestroy() {
-	log.Debug("OnDestroy")
-
 	// 关闭服务
 	n.Server.Close()
 
@@ -45,9 +48,8 @@ func (n *Node) OnDestroy() {
 }
 
 func (n *Node) Run(closeSig chan bool) {
-	log.Debug("OnRun")
 	// 连接到center服务器
-	n.ClientManager.NewAndStart(n.NodeCfg.CenterAddr, &ClientHandler{}, msg.Processor)
+	n.ClientManager.NewAndStart(n.NodeCfg.CenterAddr, &ClientHandler{Node: n}, processor)
 
 	for {
 		n.AgentManager.Run()

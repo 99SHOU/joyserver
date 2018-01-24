@@ -19,10 +19,10 @@ func (sh *ServerHandler) Register(server *net.Server) {
 	server.OnCloseAgent = sh.CloseAgent
 }
 
-func (sh *ServerHandler) NewAgent(agent *net.ServerAgent) {
+func (sh *ServerHandler) NewAgent(agent net.Agent) {
 }
 
-func (sh *ServerHandler) CloseAgent(agent *net.ServerAgent) {
+func (sh *ServerHandler) CloseAgent(agent net.Agent) {
 }
 
 func (sh *ServerHandler) onConnectToGateReq(message interface{}, agent interface{}) {

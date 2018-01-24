@@ -39,10 +39,10 @@ type Server struct {
 	LenMsgLen    int
 	LittleEndian bool
 	TcpServer    *network.TCPServer
-	Agent        *ServerAgent
+	Agent        *BaseAgent
 
-	OnNewAgent   func(*ServerAgent)
-	OnCloseAgent func(*ServerAgent)
+	OnNewAgent   func(Agent)
+	OnCloseAgent func(Agent)
 }
 
 func (server *Server) SetHandler(id pb.MsgID, handler MsgHandler) {
@@ -65,19 +65,18 @@ func (server *Server) Start() {
 		tcpServer.MaxMsgLen = server.MaxMsgLen
 		tcpServer.LittleEndian = server.LittleEndian
 		tcpServer.NewAgent = func(conn *network.TCPConn) network.Agent {
-			a := &ServerAgent{Server: server, onCloseAgent: server.OnCloseAgent, BaseAgent: BaseAgent{conn: conn, processor: server.Processor, agentInfo: NewAgentInfo()}}
-			server.Agent = a
+			server.Agent = &BaseAgent{onCloseAgent: server.OnCloseAgent, conn: conn, processor: server.Processor, agentInfo: NewAgentInfo()}
 
 			if server.OnNewAgent == nil {
 				log.Error("Must set OnNewAgent")
 			}
 
-			if a == nil {
+			if server.Agent == nil {
 				log.Error("Agent is nil")
 			}
 
-			server.OnNewAgent(a)
-			return a
+			server.OnNewAgent(server.Agent)
+			return server.Agent
 		}
 	}
 

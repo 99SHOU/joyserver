@@ -9,6 +9,14 @@ import (
 	"github.com/99SHOU/joyserver/modules"
 )
 
+var (
+	processor = net.NewProcessor()
+)
+
+func init() {
+	msg.RegisterMsg(processor)
+}
+
 type Node struct {
 	base.Node
 	AgentManager  modules.AgentManager
@@ -29,7 +37,7 @@ func (n *Node) OnInit() {
 	n.TokenManager.Init()
 
 	// 启动服务
-	n.Server = net.NewServer(n.NodeCfg.Port, &ServerHandler{Node: n}, msg.Processor)
+	n.Server = net.NewServer(n.NodeCfg.Port, &ServerHandler{Node: n}, processor)
 	n.Server.Start()
 }
 
@@ -45,7 +53,7 @@ func (n *Node) OnDestroy() {
 
 func (n *Node) Run(closeSig chan bool) {
 	// 连接到center服务器
-	n.ClientManager.NewAndStart(n.NodeCfg.CenterAddr, &ClientHandler{}, msg.Processor)
+	n.ClientManager.NewAndStart(n.NodeCfg.CenterAddr, &ClientHandler{Node: n}, processor)
 
 	for {
 		n.AgentManager.Run()

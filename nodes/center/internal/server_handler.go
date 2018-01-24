@@ -18,17 +18,17 @@ func (sh *ServerHandler) Register(server *net.Server) {
 	server.SetHandler(pb.MsgID_FWM_NODE_REGISTER_REQ, sh.OnNodeRegisterReq)
 }
 
-func (sh *ServerHandler) NewAgent(agent *net.ServerAgent) {
+func (sh *ServerHandler) NewAgent(agent net.Agent) {
 	sh.Node.AgentManager.AddAgent(agent.RemoteAddr().String(), agent)
 }
 
-func (sh *ServerHandler) CloseAgent(agent *net.ServerAgent) {
+func (sh *ServerHandler) CloseAgent(agent net.Agent) {
 	sh.Node.AgentManager.RemoveAgent(agent.RemoteAddr().String())
 }
 
 func (sh *ServerHandler) OnNodeRegisterReq(message interface{}, agent interface{}) {
 	msg := message.(*pb.NodeRegisterReq)
-	a := agent.(*net.ServerAgent)
+	a := agent.(*net.BaseAgent)
 
 	a.SetNodeType(msg.NodeType)
 	a.SetNodeID(define.NodeID(msg.NodeId))
