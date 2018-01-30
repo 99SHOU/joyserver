@@ -13,9 +13,10 @@ func NewAgentInfo() *AgentInfo {
 }
 
 type AgentInfo struct {
-	NodeType pb.NODE_TYPE
-	NodeID   define.NodeID
-	userData map[interface{}]interface{}
+	NodeType  pb.NODE_TYPE
+	NodeStatu pb.NODE_STATU
+	NodeID    define.NodeID
+	userData  map[interface{}]interface{}
 }
 
 func (info *AgentInfo) GetUserData(key interface{}) interface{} {

@@ -5,19 +5,10 @@ import (
 	"github.com/99SHOU/joyserver/common/base"
 	"github.com/99SHOU/joyserver/common/db/mysql"
 	"github.com/99SHOU/joyserver/common/define"
-	"github.com/99SHOU/joyserver/common/msg"
 	"github.com/99SHOU/joyserver/common/net"
 	"github.com/99SHOU/joyserver/common/pb"
 	"github.com/99SHOU/joyserver/modules"
 )
-
-var (
-	processor = net.NewProcessor()
-)
-
-func init() {
-	msg.RegisterMsg(processor)
-}
 
 type Node struct {
 	base.Node
@@ -28,6 +19,7 @@ type Node struct {
 
 func (n *Node) OnInit() {
 	n.NodeType = pb.NODE_TYPE_CENTER
+	n.NodeStatu = pb.NODE_STATU_NOT_READY
 	n.NodeID = n.NodeCfg.NodeID
 
 	// node模块初始化
@@ -38,8 +30,10 @@ func (n *Node) OnInit() {
 
 	n.db = mysql.Open(define.MYSQL_DNS)
 
+	n.NodeStatu = pb.NODE_STATU_READY
+
 	// 启动服务
-	n.Server = net.NewServer(n.NodeCfg.Port, &ServerHandler{Node: n}, processor)
+	n.Server = net.NewServer(n.NodeCfg.Port, &ServerHandler{Node: n}, net.NewProcessor())
 	n.Server.Start()
 }
 

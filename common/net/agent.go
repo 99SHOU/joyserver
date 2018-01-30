@@ -19,6 +19,8 @@ type Agent interface {
 
 	GetNodeType() pb.NODE_TYPE
 	SetNodeType(nodeType pb.NODE_TYPE)
+	GetNodeStatu() pb.NODE_STATU
+	SetNodeStatu(nodeStatu pb.NODE_STATU)
 	GetNodeID() define.NodeID
 	SetNodeID(nodeID define.NodeID)
 	GetAgentInfo(key interface{}) interface{}
@@ -97,6 +99,14 @@ func (a *BaseAgent) SetNodeType(nodeType pb.NODE_TYPE) {
 	a.agentInfo.NodeType = nodeType
 }
 
+func (a *BaseAgent) GetNodeStatu() pb.NODE_STATU {
+	return a.agentInfo.NodeStatu
+}
+
+func (a *BaseAgent) SetNodeStatu(nodeStatu pb.NODE_STATU) {
+	a.agentInfo.NodeStatu = nodeStatu
+}
+
 func (a *BaseAgent) GetNodeID() define.NodeID {
 	return a.agentInfo.NodeID
 }
@@ -105,9 +115,15 @@ func (a *BaseAgent) SetNodeID(nodeID define.NodeID) {
 	a.agentInfo.NodeID = nodeID
 }
 func (a *BaseAgent) GetAgentInfo(key interface{}) interface{} {
-	return a.GetAgentInfo(key)
+	return a.agentInfo.GetUserData(key)
 }
 
 func (a *BaseAgent) SetAgentInfo(key interface{}, value interface{}) {
 	a.agentInfo.SetUserData(key, value)
+}
+
+func BroadcastMsg(agents []Agent, msg interface{}) {
+	for _, agent := range agents {
+		agent.WriteMsg(msg)
+	}
 }

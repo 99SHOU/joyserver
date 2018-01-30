@@ -36,24 +36,33 @@ func (am *AgentManager) RemoveAgent(key string) {
 	delete(am.agents, key)
 }
 
-func (am *AgentManager) GetAllAgent() map[string]net.Agent {
-	return am.agents
+func (am *AgentManager) GetAgentAll() []net.Agent {
+	agents := []net.Agent{}
+
+	for _, agent := range am.agents {
+		if agent.GetNodeType() != pb.NODE_TYPE_INVALID {
+			agents = append(agents, agent)
+		}
+	}
+	return agents
 }
 
 func (am *AgentManager) GetAgentByKey(key string) net.Agent {
-	if agent, ok := am.agents[key]; ok {
+	if agent, ok := am.agents[key]; ok && agent.GetNodeStatu() == pb.NODE_STATU_READY {
 		return agent
 	}
 
 	return nil
 }
 
-func (am *AgentManager) GetAgentByNodeType(nodeType pb.NODE_TYPE) []net.Agent {
+func (am *AgentManager) GetAgentByNodeType(nodeTypes []pb.NODE_TYPE) []net.Agent {
 	agents := []net.Agent{}
 
-	for _, v := range am.agents {
-		if v.GetNodeType() == nodeType {
-			agents = append(agents, v)
+	for _, agent := range am.agents {
+		for _, nt := range nodeTypes {
+			if agent.GetNodeType() == nt && agent.GetNodeStatu() == pb.NODE_STATU_READY {
+				agents = append(agents, agent)
+			}
 		}
 	}
 
@@ -63,9 +72,9 @@ func (am *AgentManager) GetAgentByNodeType(nodeType pb.NODE_TYPE) []net.Agent {
 func (am *AgentManager) GetAgentByNodeID(nodeID define.NodeID) []net.Agent {
 	agents := []net.Agent{}
 
-	for _, v := range am.agents {
-		if v.GetNodeID() == nodeID {
-			agents = append(agents, v)
+	for _, agent := range am.agents {
+		if agent.GetNodeID() == nodeID && agent.GetNodeStatu() == pb.NODE_STATU_READY {
+			agents = append(agents, agent)
 		}
 	}
 
@@ -75,9 +84,9 @@ func (am *AgentManager) GetAgentByNodeID(nodeID define.NodeID) []net.Agent {
 func (am *AgentManager) GetAgentByNodeInfo(infoKey interface{}, infoValue interface{}) []net.Agent {
 	agents := []net.Agent{}
 
-	for _, v := range am.agents {
-		if v.GetAgentInfo(infoKey) == infoValue {
-			agents = append(agents, v)
+	for _, agent := range am.agents {
+		if agent.GetAgentInfo(infoKey) == infoValue && agent.GetNodeStatu() == pb.NODE_STATU_READY {
+			agents = append(agents, agent)
 		}
 	}
 

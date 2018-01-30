@@ -2,6 +2,7 @@ package internal
 
 import (
 	//"github.com/name5566/leaf/log"
+	"github.com/99SHOU/joyserver/common/msg"
 	"github.com/99SHOU/joyserver/common/net"
 	// "github.com/99SHOU/joyserver/common/pb"
 )
@@ -14,6 +15,7 @@ func (sh *ServerHandler) Register(server *net.Server) {
 	server.OnNewAgent = sh.NewAgent
 	server.OnCloseAgent = sh.CloseAgent
 
+	msg.RegisterMsg(server.Processor)
 }
 
 func (sh *ServerHandler) NewAgent(agent net.Agent) {

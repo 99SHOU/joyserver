@@ -13,8 +13,10 @@ var _ = fmt.Errorf
 var _ = math.Inf
 
 type NodeRegisterReq struct {
-	NodeType NODE_TYPE `protobuf:"varint,1,opt,name=NodeType,enum=pb.NODE_TYPE" json:"NodeType,omitempty"`
-	NodeId   uint32    `protobuf:"varint,2,opt,name=NodeId" json:"NodeId,omitempty"`
+	NodeType   NODE_TYPE  `protobuf:"varint,1,opt,name=NodeType,enum=pb.NODE_TYPE" json:"NodeType,omitempty"`
+	NodeStatu  NODE_STATU `protobuf:"varint,2,opt,name=NodeStatu,enum=pb.NODE_STATU" json:"NodeStatu,omitempty"`
+	NodeId     uint32     `protobuf:"varint,3,opt,name=NodeId" json:"NodeId,omitempty"`
+	ServerPort uint32     `protobuf:"varint,4,opt,name=ServerPort" json:"ServerPort,omitempty"`
 }
 
 func (m *NodeRegisterReq) Reset()                    { *m = NodeRegisterReq{} }
@@ -26,7 +28,14 @@ func (m *NodeRegisterReq) GetNodeType() NODE_TYPE {
 	if m != nil {
 		return m.NodeType
 	}
-	return NODE_TYPE_MACHINE
+	return NODE_TYPE_INVALID
+}
+
+func (m *NodeRegisterReq) GetNodeStatu() NODE_STATU {
+	if m != nil {
+		return m.NodeStatu
+	}
+	return NODE_STATU_NOT_READY
 }
 
 func (m *NodeRegisterReq) GetNodeId() uint32 {
@@ -36,9 +45,17 @@ func (m *NodeRegisterReq) GetNodeId() uint32 {
 	return 0
 }
 
+func (m *NodeRegisterReq) GetServerPort() uint32 {
+	if m != nil {
+		return m.ServerPort
+	}
+	return 0
+}
+
 type NodeRegisterAck struct {
-	NodeType NODE_TYPE `protobuf:"varint,1,opt,name=NodeType,enum=pb.NODE_TYPE" json:"NodeType,omitempty"`
-	NodeId   uint32    `protobuf:"varint,2,opt,name=NodeId" json:"NodeId,omitempty"`
+	NodeType  NODE_TYPE  `protobuf:"varint,1,opt,name=NodeType,enum=pb.NODE_TYPE" json:"NodeType,omitempty"`
+	NodeStatu NODE_STATU `protobuf:"varint,2,opt,name=NodeStatu,enum=pb.NODE_STATU" json:"NodeStatu,omitempty"`
+	NodeId    uint32     `protobuf:"varint,3,opt,name=NodeId" json:"NodeId,omitempty"`
 }
 
 func (m *NodeRegisterAck) Reset()                    { *m = NodeRegisterAck{} }
@@ -50,7 +67,14 @@ func (m *NodeRegisterAck) GetNodeType() NODE_TYPE {
 	if m != nil {
 		return m.NodeType
 	}
-	return NODE_TYPE_MACHINE
+	return NODE_TYPE_INVALID
+}
+
+func (m *NodeRegisterAck) GetNodeStatu() NODE_STATU {
+	if m != nil {
+		return m.NodeStatu
+	}
+	return NODE_STATU_NOT_READY
 }
 
 func (m *NodeRegisterAck) GetNodeId() uint32 {
@@ -60,22 +84,115 @@ func (m *NodeRegisterAck) GetNodeId() uint32 {
 	return 0
 }
 
+type SetNodeStatu struct {
+	NodeStatu NODE_STATU `protobuf:"varint,1,opt,name=NodeStatu,enum=pb.NODE_STATU" json:"NodeStatu,omitempty"`
+}
+
+func (m *SetNodeStatu) Reset()                    { *m = SetNodeStatu{} }
+func (m *SetNodeStatu) String() string            { return proto.CompactTextString(m) }
+func (*SetNodeStatu) ProtoMessage()               {}
+func (*SetNodeStatu) Descriptor() ([]byte, []int) { return fileDescriptor2, []int{2} }
+
+func (m *SetNodeStatu) GetNodeStatu() NODE_STATU {
+	if m != nil {
+		return m.NodeStatu
+	}
+	return NODE_STATU_NOT_READY
+}
+
+type NodeInfo struct {
+	NodeType  NODE_TYPE  `protobuf:"varint,1,opt,name=NodeType,enum=pb.NODE_TYPE" json:"NodeType,omitempty"`
+	NodeStatu NODE_STATU `protobuf:"varint,2,opt,name=NodeStatu,enum=pb.NODE_STATU" json:"NodeStatu,omitempty"`
+	NodeId    uint32     `protobuf:"varint,3,opt,name=NodeId" json:"NodeId,omitempty"`
+	Addr      string     `protobuf:"bytes,4,opt,name=Addr" json:"Addr,omitempty"`
+}
+
+func (m *NodeInfo) Reset()                    { *m = NodeInfo{} }
+func (m *NodeInfo) String() string            { return proto.CompactTextString(m) }
+func (*NodeInfo) ProtoMessage()               {}
+func (*NodeInfo) Descriptor() ([]byte, []int) { return fileDescriptor2, []int{3} }
+
+func (m *NodeInfo) GetNodeType() NODE_TYPE {
+	if m != nil {
+		return m.NodeType
+	}
+	return NODE_TYPE_INVALID
+}
+
+func (m *NodeInfo) GetNodeStatu() NODE_STATU {
+	if m != nil {
+		return m.NodeStatu
+	}
+	return NODE_STATU_NOT_READY
+}
+
+func (m *NodeInfo) GetNodeId() uint32 {
+	if m != nil {
+		return m.NodeId
+	}
+	return 0
+}
+
+func (m *NodeInfo) GetAddr() string {
+	if m != nil {
+		return m.Addr
+	}
+	return ""
+}
+
+type GameNodeListReq struct {
+}
+
+func (m *GameNodeListReq) Reset()                    { *m = GameNodeListReq{} }
+func (m *GameNodeListReq) String() string            { return proto.CompactTextString(m) }
+func (*GameNodeListReq) ProtoMessage()               {}
+func (*GameNodeListReq) Descriptor() ([]byte, []int) { return fileDescriptor2, []int{4} }
+
+type GameNodeListAck struct {
+	NodeInfos []*NodeInfo `protobuf:"bytes,1,rep,name=NodeInfos" json:"NodeInfos,omitempty"`
+}
+
+func (m *GameNodeListAck) Reset()                    { *m = GameNodeListAck{} }
+func (m *GameNodeListAck) String() string            { return proto.CompactTextString(m) }
+func (*GameNodeListAck) ProtoMessage()               {}
+func (*GameNodeListAck) Descriptor() ([]byte, []int) { return fileDescriptor2, []int{5} }
+
+func (m *GameNodeListAck) GetNodeInfos() []*NodeInfo {
+	if m != nil {
+		return m.NodeInfos
+	}
+	return nil
+}
+
 func init() {
 	proto.RegisterType((*NodeRegisterReq)(nil), "pb.NodeRegisterReq")
 	proto.RegisterType((*NodeRegisterAck)(nil), "pb.NodeRegisterAck")
+	proto.RegisterType((*SetNodeStatu)(nil), "pb.SetNodeStatu")
+	proto.RegisterType((*NodeInfo)(nil), "pb.NodeInfo")
+	proto.RegisterType((*GameNodeListReq)(nil), "pb.GameNodeListReq")
+	proto.RegisterType((*GameNodeListAck)(nil), "pb.GameNodeListAck")
 }
 
 func init() { proto.RegisterFile("framework_msg.proto", fileDescriptor2) }
 
 var fileDescriptor2 = []byte{
-	// 141 bytes of a gzipped FileDescriptorProto
+	// 275 bytes of a gzipped FileDescriptorProto
 	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0xe2, 0x12, 0x4e, 0x2b, 0x4a, 0xcc,
 	0x4d, 0x2d, 0xcf, 0x2f, 0xca, 0x8e, 0xcf, 0x2d, 0x4e, 0xd7, 0x2b, 0x28, 0xca, 0x2f, 0xc9, 0x17,
-	0x62, 0x2a, 0x48, 0x92, 0xe2, 0x49, 0x49, 0x4d, 0xcb, 0xcc, 0x4b, 0x85, 0x88, 0x28, 0x85, 0x70,
-	0xf1, 0xfb, 0xe5, 0xa7, 0xa4, 0x06, 0xa5, 0xa6, 0x67, 0x16, 0x97, 0xa4, 0x16, 0x05, 0xa5, 0x16,
-	0x0a, 0x69, 0x72, 0x71, 0x80, 0x84, 0x42, 0x2a, 0x0b, 0x52, 0x25, 0x18, 0x15, 0x18, 0x35, 0xf8,
-	0x8c, 0x78, 0xf5, 0x0a, 0x92, 0xf4, 0xfc, 0xfc, 0x5d, 0x5c, 0xe3, 0x43, 0x22, 0x03, 0x5c, 0x83,
-	0xe0, 0xd2, 0x42, 0x62, 0x5c, 0x6c, 0x20, 0xb6, 0x67, 0x8a, 0x04, 0x93, 0x02, 0xa3, 0x06, 0x6f,
-	0x10, 0x94, 0x87, 0x6e, 0xaa, 0x63, 0x72, 0x36, 0x15, 0x4c, 0x4d, 0x62, 0x03, 0x3b, 0xd9, 0x18,
-	0x10, 0x00, 0x00, 0xff, 0xff, 0xdd, 0x77, 0x3d, 0xf3, 0xdb, 0x00, 0x00, 0x00,
+	0x62, 0x2a, 0x48, 0x92, 0xe2, 0x49, 0x49, 0x4d, 0xcb, 0xcc, 0x4b, 0x85, 0x88, 0x28, 0x2d, 0x62,
+	0xe4, 0xe2, 0xf7, 0xcb, 0x4f, 0x49, 0x0d, 0x4a, 0x4d, 0xcf, 0x2c, 0x2e, 0x49, 0x2d, 0x0a, 0x4a,
+	0x2d, 0x14, 0xd2, 0xe4, 0xe2, 0x00, 0x09, 0x85, 0x54, 0x16, 0xa4, 0x4a, 0x30, 0x2a, 0x30, 0x6a,
+	0xf0, 0x19, 0xf1, 0xea, 0x15, 0x24, 0xe9, 0xf9, 0xf9, 0xbb, 0xb8, 0xc6, 0x87, 0x44, 0x06, 0xb8,
+	0x06, 0xc1, 0xa5, 0x85, 0x74, 0xb8, 0x38, 0x41, 0xec, 0xe0, 0x92, 0xc4, 0x92, 0x52, 0x09, 0x26,
+	0xb0, 0x5a, 0x3e, 0xb8, 0xda, 0xe0, 0x10, 0xc7, 0x90, 0xd0, 0x20, 0x84, 0x02, 0x21, 0x31, 0x2e,
+	0x36, 0x10, 0xc7, 0x33, 0x45, 0x82, 0x59, 0x81, 0x51, 0x83, 0x37, 0x08, 0xca, 0x13, 0x92, 0xe3,
+	0xe2, 0x0a, 0x4e, 0x2d, 0x2a, 0x4b, 0x2d, 0x0a, 0xc8, 0x2f, 0x2a, 0x91, 0x60, 0x01, 0xcb, 0x21,
+	0x89, 0x28, 0x35, 0xa1, 0x39, 0xd2, 0x31, 0x39, 0x9b, 0xee, 0x8e, 0x54, 0xb2, 0xe1, 0xe2, 0x09,
+	0x4e, 0x2d, 0x41, 0xa8, 0x43, 0x31, 0x95, 0x91, 0x80, 0xa9, 0x4a, 0xfd, 0x8c, 0x10, 0xf7, 0x7a,
+	0xe6, 0xa5, 0xe5, 0xd3, 0x3f, 0x80, 0x85, 0xb8, 0x58, 0x1c, 0x53, 0x52, 0x8a, 0xc0, 0x41, 0xcb,
+	0x19, 0x04, 0x66, 0x2b, 0x09, 0x72, 0xf1, 0xbb, 0x27, 0xe6, 0xa6, 0x82, 0x54, 0xf8, 0x64, 0x16,
+	0x97, 0x04, 0xa5, 0x16, 0x2a, 0xd9, 0xa2, 0x0a, 0x81, 0x82, 0x59, 0x0b, 0x62, 0x3f, 0xc8, 0xd9,
+	0xc5, 0x12, 0x8c, 0x0a, 0xcc, 0x1a, 0xdc, 0x46, 0x3c, 0x60, 0xfb, 0xa1, 0x82, 0x41, 0x08, 0xe9,
+	0x24, 0x36, 0x70, 0x92, 0x32, 0x06, 0x04, 0x00, 0x00, 0xff, 0xff, 0x6c, 0x55, 0xfb, 0xab, 0x7b,
+	0x02, 0x00, 0x00,
 }

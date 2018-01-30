@@ -27,7 +27,7 @@ func main() {
 	centerAddr := flag.String("center", "", "")
 	port := flag.Uint("port", 0, "")
 
-	nodeCfg := base.NodeConfig{NodeID: define.NodeID(*nodeID), CenterAddr: *centerAddr, Port: *port}
+	nodeCfg := base.NodeConfig{NodeID: define.NodeID(*nodeID), CenterAddr: *centerAddr, Port: uint32(*port)}
 
 	if *server == "error" {
 		machine.Node.NodeCfg = base.NodeConfig{NodeID: 0, CenterAddr: "127.0.0.1:2001", Port: 2000}

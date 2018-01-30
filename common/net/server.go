@@ -8,7 +8,7 @@ import (
 	"strconv"
 )
 
-func NewServer(port uint, serverHandler ServerHandler, processor *Processor) Server {
+func NewServer(port uint32, serverHandler ServerHandler, processor *Processor) Server {
 	tcpAddr := "127.0.0.1" + ":" + strconv.FormatUint(uint64(port), 10)
 
 	server := Server{
@@ -66,15 +66,6 @@ func (server *Server) Start() {
 		tcpServer.LittleEndian = server.LittleEndian
 		tcpServer.NewAgent = func(conn *network.TCPConn) network.Agent {
 			server.Agent = &BaseAgent{onCloseAgent: server.OnCloseAgent, conn: conn, processor: server.Processor, agentInfo: NewAgentInfo()}
-
-			if server.OnNewAgent == nil {
-				log.Error("Must set OnNewAgent")
-			}
-
-			if server.Agent == nil {
-				log.Error("Agent is nil")
-			}
-
 			server.OnNewAgent(server.Agent)
 			return server.Agent
 		}

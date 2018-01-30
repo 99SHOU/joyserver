@@ -8,7 +8,7 @@ import (
 	"time"
 )
 
-func NewClient(addr string, clientHandler ClientHandler, processor *Processor) Client {
+func NewClient(addr string, clientHandler ClientHandler, processor *Processor) *Client {
 	client := Client{
 		Addr:            addr,
 		ConnNum:         1,
@@ -25,7 +25,7 @@ func NewClient(addr string, clientHandler ClientHandler, processor *Processor) C
 	client.Processor.SetByteOrder(client.LittleEndian)
 	clientHandler.Register(&client)
 
-	return client
+	return &client
 }
 
 type Client struct {
