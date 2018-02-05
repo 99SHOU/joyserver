@@ -9,13 +9,14 @@ import (
 type NodeConfig struct {
 	NodeID     define.NodeID
 	CenterAddr string
-	Port       uint32
+	NodePort   uint32
+	ServerPort uint32
 }
 
 type Node struct {
-	NodeType  pb.NODE_TYPE
-	NodeStatu pb.NODE_STATU
-	NodeID    define.NodeID
-	NodeCfg   NodeConfig
-	Server    net.Server
+	NodeType   pb.NODE_TYPE
+	NodeStatu  pb.NODE_STATU
+	NodeID     define.NodeID
+	NodeCfg    NodeConfig
+	NodeServer net.Server
 }

@@ -52,6 +52,10 @@ func (client *Client) SetHandler(id pb.MsgID, handler MsgHandler) {
 	client.Processor.SetHandler(uint16(id), handler)
 }
 
+func (client *Client) SetOtherHandler(handler MsgHandler) {
+	client.Processor.SetOtherHandler(handler)
+}
+
 func (client *Client) Start() {
 	if client.TcpClient != nil {
 		log.Error("client is start!")

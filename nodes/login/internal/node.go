@@ -10,7 +10,7 @@ import (
 type Node struct {
 	base.Node
 	AgentManager  modules.AgentManager
-	ClientManager modules.ClientManager
+	ClientManager modules.NodeClientManager
 }
 
 func (n *Node) OnInit() {
@@ -20,18 +20,18 @@ func (n *Node) OnInit() {
 
 	// node模块初始化
 	n.AgentManager = modules.AgentManager{}
-	n.ClientManager = modules.ClientManager{}
+	n.ClientManager = modules.NodeClientManager{}
 	n.AgentManager.Init()
 	n.ClientManager.Init()
 
 	// 启动服务
-	n.Server = net.NewServer(n.NodeCfg.Port, &ServerHandler{Node: n}, net.NewProcessor())
-	n.Server.Start()
+	n.NodeServer = net.NewServer(n.NodeCfg.NodePort, &NodeServerHandler{Node: n}, net.NewProcessor())
+	n.NodeServer.Start()
 }
 
 func (n *Node) OnDestroy() {
 	// 关闭服务
-	n.Server.Close()
+	n.NodeServer.Close()
 
 	// node模块销毁
 	n.ClientManager.Destroy()
@@ -40,7 +40,7 @@ func (n *Node) OnDestroy() {
 
 func (n *Node) Run(closeSig chan bool) {
 	// 连接到center服务器
-	n.ClientManager.NewAndStart(n.NodeCfg.CenterAddr, &ClientHandler{Node: n}, net.NewProcessor())
+	n.ClientManager.NewAndStart(n.NodeCfg.CenterAddr, &NodeClientHandler{Node: n}, net.NewProcessor())
 
 	for {
 		n.AgentManager.Run()

@@ -7,24 +7,24 @@ import (
 	// "github.com/99SHOU/joyserver/common/pb"
 )
 
-type ServerHandler struct {
+type NodeServerHandler struct {
 	Node *Node
 }
 
-func (sh *ServerHandler) Register(server *net.Server) {
-	server.OnNewAgent = sh.NewAgent
-	server.OnCloseAgent = sh.CloseAgent
+func (h *NodeServerHandler) Register(server *net.Server) {
+	server.OnNewAgent = h.NewAgent
+	server.OnCloseAgent = h.CloseAgent
 
 	msg.RegisterMsg(server.Processor)
 }
 
-func (sh *ServerHandler) NewAgent(agent net.Agent) {
+func (h *NodeServerHandler) NewAgent(agent net.Agent) {
 }
 
-func (sh *ServerHandler) CloseAgent(agent net.Agent) {
+func (h *NodeServerHandler) CloseAgent(agent net.Agent) {
 }
 
-func (sh *ServerHandler) onLoginReq(message interface{}, agent interface{}) {
+func (h *NodeServerHandler) onLoginReq(message interface{}, agent interface{}) {
 	// msg := message.(*pb.LoginReq)
 	// a := agent.(*net.BaseAgent)
 

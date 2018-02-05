@@ -27,14 +27,21 @@ func main() {
 	centerAddr := flag.String("center", "", "")
 	port := flag.Uint("port", 0, "")
 
-	nodeCfg := base.NodeConfig{NodeID: define.NodeID(*nodeID), CenterAddr: *centerAddr, Port: uint32(*port)}
+	nodeCfg := base.NodeConfig{NodeID: define.NodeID(*nodeID), CenterAddr: *centerAddr, NodePort: uint32(*port)}
 
 	if *server == "error" {
-		machine.Node.NodeCfg = base.NodeConfig{NodeID: 0, CenterAddr: "127.0.0.1:2001", Port: 2000}
-		center.Node.NodeCfg = base.NodeConfig{NodeID: 1, CenterAddr: "127.0.0.1", Port: 2001}
-		game.Node.NodeCfg = base.NodeConfig{NodeID: 2, CenterAddr: "127.0.0.1:2001", Port: 2002}
-		gate.Node.NodeCfg = base.NodeConfig{NodeID: 3, CenterAddr: "127.0.0.1:2001", Port: 2003}
-		login.Node.NodeCfg = base.NodeConfig{NodeID: 4, CenterAddr: "127.0.0.1:2001", Port: 2004}
+		machine.Node.NodeCfg = base.NodeConfig{NodeID: 0, CenterAddr: "127.0.0.1:2001", NodePort: 2000}
+		center.Node.NodeCfg = base.NodeConfig{NodeID: 1, CenterAddr: "127.0.0.1", NodePort: 2001}
+		game.Node.NodeCfg = base.NodeConfig{NodeID: 2, CenterAddr: "127.0.0.1:2001", NodePort: 2002}
+		gate.Node.NodeCfg = base.NodeConfig{NodeID: 3, CenterAddr: "127.0.0.1:2001", NodePort: 2003}
+		login.Node.NodeCfg = base.NodeConfig{NodeID: 4, CenterAddr: "127.0.0.1:2001", NodePort: 2004}
+
+		game.Node1.NodeCfg = base.NodeConfig{NodeID: 5, CenterAddr: "127.0.0.1:2001", NodePort: 2005}
+		gate.Node1.NodeCfg = base.NodeConfig{NodeID: 6, CenterAddr: "127.0.0.1:2001", NodePort: 2006}
+		game.Node2.NodeCfg = base.NodeConfig{NodeID: 7, CenterAddr: "127.0.0.1:2001", NodePort: 2007}
+		gate.Node2.NodeCfg = base.NodeConfig{NodeID: 8, CenterAddr: "127.0.0.1:2001", NodePort: 2008}
+		game.Node3.NodeCfg = base.NodeConfig{NodeID: 9, CenterAddr: "127.0.0.1:2001", NodePort: 2009}
+		gate.Node3.NodeCfg = base.NodeConfig{NodeID: 10, CenterAddr: "127.0.0.1:2001", NodePort: 2010}
 
 		leaf.Run(
 			machine.Node,
@@ -42,6 +49,13 @@ func main() {
 			game.Node,
 			gate.Node,
 			login.Node,
+
+			// game.Node1,
+			// gate.Node1,
+			// game.Node2,
+			// gate.Node2,
+			// game.Node3,
+			// gate.Node3,
 		)
 	} else {
 		switch *server {

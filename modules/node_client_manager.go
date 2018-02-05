@@ -5,25 +5,25 @@ import (
 	"github.com/name5566/leaf/log"
 )
 
-type ClientManager struct {
+type NodeClientManager struct {
 	clients map[string]*net.Client
 }
 
-func (cm *ClientManager) Init() {
+func (cm *NodeClientManager) Init() {
 	cm.clients = make(map[string]*net.Client)
 }
 
-func (cm *ClientManager) Destroy() {
+func (cm *NodeClientManager) Destroy() {
 	for _, client := range cm.clients {
 		client.Close()
 	}
 }
 
-func (cm *ClientManager) Run() {
+func (cm *NodeClientManager) Run() {
 
 }
 
-func (cm *ClientManager) NewAndStart(addr string, clientHandler net.ClientHandler, processor *net.Processor) {
+func (cm *NodeClientManager) NewAndStart(addr string, clientHandler net.ClientHandler, processor *net.Processor) {
 	if _, ok := cm.clients[addr]; ok {
 		log.Error("Client is exist: Addr: %v", addr)
 		return
@@ -34,7 +34,7 @@ func (cm *ClientManager) NewAndStart(addr string, clientHandler net.ClientHandle
 	cm.clients[addr] = client
 }
 
-func (cm *ClientManager) GetClient(addr string) *net.Client {
+func (cm *NodeClientManager) GetClient(addr string) *net.Client {
 	if _, ok := cm.clients[addr]; !ok {
 		return nil
 	}
@@ -42,7 +42,7 @@ func (cm *ClientManager) GetClient(addr string) *net.Client {
 	return cm.clients[addr]
 }
 
-func (cm *ClientManager) ExistClient(addr string) bool {
+func (cm *NodeClientManager) ExistClient(addr string) bool {
 	if _, ok := cm.clients[addr]; ok {
 		return true
 	} else {

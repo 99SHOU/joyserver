@@ -33,13 +33,13 @@ func (n *Node) OnInit() {
 	n.NodeStatu = pb.NODE_STATU_READY
 
 	// 启动服务
-	n.Server = net.NewServer(n.NodeCfg.Port, &ServerHandler{Node: n}, net.NewProcessor())
-	n.Server.Start()
+	n.NodeServer = net.NewServer(n.NodeCfg.NodePort, &NodeServerHandler{Node: n}, net.NewProcessor())
+	n.NodeServer.Start()
 }
 
 func (n *Node) OnDestroy() {
 	// 关闭服务
-	n.Server.Close()
+	n.NodeServer.Close()
 
 	// node模块销毁
 	n.AgentManager.Destroy()

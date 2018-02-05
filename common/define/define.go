@@ -7,3 +7,4 @@ const (
 )
 
 type NodeID uint32
+type CharacterID uint64

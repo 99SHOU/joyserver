@@ -13,9 +13,10 @@ import (
 // | id | protobuf message |
 // -------------------------
 type Processor struct {
-	littleEndian bool
-	msgInfo      map[uint16]*MsgInfo
-	msgIDs       map[reflect.Type]uint16
+	littleEndian    bool
+	msgInfo         map[uint16]*MsgInfo
+	msgIDs          map[reflect.Type]uint16
+	otherMsgHandler MsgHandler
 }
 
 type MsgInfo struct {
@@ -75,6 +76,15 @@ func (p *Processor) SetHandler(id uint16, msghandler MsgHandler) {
 	mi.msgHandler = msghandler
 }
 
+func (p *Processor) SetOtherHandler(msghandler MsgHandler) {
+	if p.otherMsgHandler != nil {
+		log.Fatal("Other msg handler is already registered")
+		return
+	}
+
+	p.otherMsgHandler = msghandler
+}
+
 func (p *Processor) Dispatch(msg interface{}, userdata interface{}) {
 	id, ok := p.msgIDs[reflect.TypeOf(msg)]
 	if !ok {
@@ -88,12 +98,18 @@ func (p *Processor) Dispatch(msg interface{}, userdata interface{}) {
 		return
 	}
 
-	if mi.msgHandler == nil {
+	if mi.msgHandler == nil && p.otherMsgHandler == nil {
 		log.Error("msg %v handler is not registered", mi.msgType)
 		return
 	}
 
-	mi.msgHandler(msg, userdata)
+	if mi.msgHandler != nil {
+		mi.msgHandler(msg, userdata)
+	}
+
+	if p.otherMsgHandler != nil {
+		p.otherMsgHandler(msg, userdata)
+	}
 }
 
 // goroutine safe
