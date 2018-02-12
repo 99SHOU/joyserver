@@ -7,6 +7,7 @@ import (
 	"github.com/name5566/leaf/network"
 	"net"
 	"reflect"
+	"runtime/debug"
 )
 
 // AgentInterface
@@ -36,12 +37,16 @@ type BaseAgent struct {
 }
 
 func (a *BaseAgent) Run() {
+	defer func() {
+		if err := recover(); err != nil {
+			log.Error("Agent Error: %v \n %v", err, string(debug.Stack()))
+		}
+	}()
+
 	for {
 		data, err := a.conn.ReadMsg()
 		if err != nil {
-			if err.Error() != "EOF" {
-				log.Debug("read message: %v", err)
-			}
+			log.Debug("read message: %v", err)
 			break
 		}
 

@@ -1,10 +1,7 @@
 package internal
 
 import (
-	"database/sql"
 	"github.com/99SHOU/joyserver/common/base"
-	"github.com/99SHOU/joyserver/common/db/mysql"
-	"github.com/99SHOU/joyserver/common/define"
 	"github.com/99SHOU/joyserver/common/net"
 	"github.com/99SHOU/joyserver/common/pb"
 	"github.com/99SHOU/joyserver/modules"
@@ -12,9 +9,7 @@ import (
 
 type Node struct {
 	base.Node
-	AgentManager         modules.AgentManager
-	AccountVerifyManager AccountVerifyManager
-	db                   *sql.DB
+	ModulesManager modules.ModulesManager
 }
 
 func (n *Node) OnInit() {
@@ -22,13 +17,13 @@ func (n *Node) OnInit() {
 	n.NodeStatu = pb.NODE_STATU_NOT_READY
 	n.NodeID = n.NodeCfg.NodeID
 
-	// node模块初始化
-	n.AgentManager = modules.AgentManager{}
-	n.AccountVerifyManager = AccountVerifyManager{db: n.db}
-	n.AgentManager.Init()
-	n.AccountVerifyManager.Init()
+	// node模块注册
+	n.ModulesManager = modules.NewModulesManager()
+	n.ModulesManager.Register(&modules.DBManager{})
+	n.ModulesManager.Register(&modules.AgentManager{})
 
-	n.db = mysql.Open(define.MYSQL_DNS)
+	n.ModulesManager.Init()
+	n.ModulesManager.AfterInit()
 
 	n.NodeStatu = pb.NODE_STATU_READY
 
@@ -42,14 +37,14 @@ func (n *Node) OnDestroy() {
 	n.NodeServer.Close()
 
 	// node模块销毁
-	n.AgentManager.Destroy()
+	n.ModulesManager.BeforeDestroy()
+	n.ModulesManager.Destroy()
 }
 
 func (n *Node) Run(closeSig chan bool) {
 
 	for {
-		n.AgentManager.Run()
-		n.AccountVerifyManager.Run()
+		n.ModulesManager.Run()
 
 		if <-closeSig {
 			break

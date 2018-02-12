@@ -10,9 +10,9 @@ import (
 
 type Node struct {
 	base.Node
-	AgentManager  modules.AgentManager
-	ClientManager modules.NodeClientManager
-	TokenManager  TokenMgr
+	ModuleManager modules.ModulesManager
+
+	nodeClientManager *modules.NodeClientManager
 }
 
 func (n *Node) OnInit() {
@@ -20,13 +20,16 @@ func (n *Node) OnInit() {
 	n.NodeStatu = pb.NODE_STATU_NOT_READY
 	n.NodeID = n.NodeCfg.NodeID
 
-	// node模块初始化
-	n.AgentManager = modules.AgentManager{}
-	n.ClientManager = modules.NodeClientManager{}
-	n.TokenManager = TokenMgr{}
-	n.AgentManager.Init()
-	n.ClientManager.Init()
-	n.TokenManager.Init()
+	// node模块注册
+	n.ModuleManager = modules.NewModulesManager()
+	n.ModuleManager.Register(&modules.AgentManager{})
+	n.ModuleManager.Register(&modules.NodeClientManager{})
+	n.ModuleManager.Register(&TokenMgr{})
+
+	n.ModuleManager.Init()
+	n.ModuleManager.AfterInit()
+
+	n.nodeClientManager = n.ModuleManager.Find("NodeClientManager").(*modules.NodeClientManager)
 
 	// 启动服务
 	n.NodeServer = net.NewServer(n.NodeCfg.NodePort, &NodeServerHandler{Node: n}, net.NewProcessor())
@@ -38,18 +41,16 @@ func (n *Node) OnDestroy() {
 	n.NodeServer.Close()
 
 	// node模块销毁
-	n.TokenManager.Destroy()
-	n.ClientManager.Destroy()
-	n.AgentManager.Destroy()
+	n.ModuleManager.BeforeDestroy()
+	n.ModuleManager.Destroy()
 }
 
 func (n *Node) Run(closeSig chan bool) {
 	// 连接到center服务器
-	n.ClientManager.NewAndStart(n.NodeCfg.CenterAddr, &NodeClientHandler{Node: n}, net.NewProcessor())
+	n.nodeClientManager.NewAndStart(n.NodeCfg.CenterAddr, &NodeClientHandler{Node: n}, net.NewProcessor())
 
 	for {
-		n.AgentManager.Run()
-		n.ClientManager.Run()
+		n.ModuleManager.Run()
 
 		if <-closeSig {
 			break

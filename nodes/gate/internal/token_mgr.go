@@ -1,15 +1,25 @@
 package internal
 
 import (
+	"github.com/99SHOU/joyserver/modules"
 	"github.com/name5566/leaf/log"
 )
 
 type TokenMgr struct {
+	modules.BaseModule
 	tokenList map[string]string
 }
 
 func (tm *TokenMgr) Init() {
 	tm.tokenList = make(map[string]string)
+}
+
+func (tm *TokenMgr) AfterInit() {
+
+}
+
+func (tm *TokenMgr) BeforeDestroy() {
+
 }
 
 func (tm *TokenMgr) Destroy() {

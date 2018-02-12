@@ -5,14 +5,18 @@ import (
 	"github.com/99SHOU/joyserver/common/msg"
 	"github.com/99SHOU/joyserver/common/net"
 	"github.com/99SHOU/joyserver/common/pb"
+	"github.com/99SHOU/joyserver/modules"
 	"github.com/name5566/leaf/log"
 )
 
 type NodeClientHandler struct {
-	Node *Node
+	Node         *Node
+	agentManager *modules.AgentManager
 }
 
 func (h *NodeClientHandler) Register(client *net.Client) {
+	h.agentManager = h.Node.ModulesManager.Find("AgentManager").(*modules.AgentManager)
+
 	client.OnNewAgent = h.NewAgent
 	client.OnCloseAgent = h.CloseAgent
 
@@ -21,13 +25,13 @@ func (h *NodeClientHandler) Register(client *net.Client) {
 }
 
 func (h *NodeClientHandler) NewAgent(agent net.Agent) {
-	h.Node.AgentManager.AddAgent(agent.RemoteAddr().String(), agent)
+	h.agentManager.AddAgent(agent.RemoteAddr().String(), agent)
 
 	h.NodeRegisterReq(agent)
 }
 
 func (h *NodeClientHandler) CloseAgent(agent net.Agent) {
-	h.Node.AgentManager.RemoveAgent(agent.RemoteAddr().String())
+	h.agentManager.RemoveAgent(agent.RemoteAddr().String())
 }
 
 func (h *NodeClientHandler) NodeRegisterReq(agent net.Agent) {
@@ -43,7 +47,7 @@ func (h *NodeClientHandler) OnNodeRegisterAck(message interface{}, agent interfa
 
 	if a.GetNodeType() == pb.NODE_TYPE_CENTER {
 		h.Node.NodeStatu = pb.NODE_STATU_READY
-		allAgent := h.Node.AgentManager.GetAgentAll()
+		allAgent := h.agentManager.GetAgentAll(nil)
 		net.BroadcastMsg(allAgent, &pb.SetNodeStatu{NodeStatu: h.Node.NodeStatu})
 	}
 

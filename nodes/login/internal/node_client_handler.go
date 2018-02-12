@@ -43,7 +43,7 @@ func (h *NodeClientHandler) OnNodeRegisterAck(message interface{}, agent interfa
 
 	if a.GetNodeType() == pb.NODE_TYPE_CENTER {
 		h.Node.NodeStatu = pb.NODE_STATU_READY
-		allAgent := h.Node.AgentManager.GetAgentAll()
+		allAgent := h.Node.AgentManager.GetAgentAll(nil)
 		net.BroadcastMsg(allAgent, &pb.SetNodeStatu{NodeStatu: h.Node.NodeStatu})
 	}
 

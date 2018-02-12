@@ -9,8 +9,7 @@ import (
 
 type Node struct {
 	base.Node
-	AgentManager      modules.AgentManager
-	NodeClientManager modules.NodeClientManager
+	ModulesManager modules.ModulesManager
 }
 
 func (n *Node) OnInit() {
@@ -19,15 +18,15 @@ func (n *Node) OnInit() {
 	n.NodeStatu = pb.NODE_STATU_NOT_READY
 	n.NodeID = n.NodeCfg.NodeID
 
-	// node模块初始化
-	n.AgentManager = modules.AgentManager{}
-	n.NodeClientManager = modules.NodeClientManager{}
-	n.AgentManager.Init()
-	n.NodeClientManager.Init()
+	// node模块注册
+	n.ModulesManager = modules.NewModulesManager()
+	n.ModulesManager.Register(&modules.DBManager{})
+	// n.ModulesManager.Register(&modules.LoginManager{})
+	n.ModulesManager.Register(&modules.AgentManager{})
+	// n.ModulesManager.Register(&modules.PlayerIdManager{})
 
-	// 启动服务
-	n.NodeServer = net.NewServer(n.NodeCfg.NodePort, &NodeServerHandler{Node: n}, net.NewProcessor())
-	n.NodeServer.Start()
+	n.ModulesManager.Init()
+	n.ModulesManager.AfterInit()
 }
 
 func (n *Node) OnDestroy() {
@@ -35,17 +34,17 @@ func (n *Node) OnDestroy() {
 	n.NodeServer.Close()
 
 	// node模块销毁
-	n.NodeClientManager.Destroy()
-	n.AgentManager.Destroy()
+	n.ModulesManager.BeforeDestroy()
+	n.ModulesManager.Destroy()
 }
 
 func (n *Node) Run(closeSig chan bool) {
-	// 连接到center服务器
-	n.NodeClientManager.NewAndStart(n.NodeCfg.CenterAddr, &NodeClientHandler{Node: n}, net.NewProcessor())
+	// 启动服务
+	n.NodeServer = net.NewServer(n.NodeCfg.ServerPort, &NodeServerHandler{Node: n}, net.NewProcessor())
+	n.NodeServer.Start()
 
 	for {
-		n.AgentManager.Run()
-		n.NodeClientManager.Run()
+		n.ModulesManager.Run()
 
 		if <-closeSig {
 			break

@@ -5,16 +5,20 @@ import (
 	"github.com/99SHOU/joyserver/common/msg"
 	"github.com/99SHOU/joyserver/common/net"
 	"github.com/99SHOU/joyserver/common/pb"
+	"github.com/99SHOU/joyserver/modules"
 	"github.com/name5566/leaf/log"
 	"strconv"
 	"strings"
 )
 
 type NodeServerHandler struct {
-	Node *Node
+	Node         *Node
+	agentManager *modules.AgentManager
 }
 
 func (h *NodeServerHandler) Register(server *net.Server) {
+	h.agentManager = h.Node.ModulesManager.Find("AgentManager").(*modules.AgentManager)
+
 	server.OnNewAgent = h.NewAgent
 	server.OnCloseAgent = h.CloseAgent
 
@@ -25,11 +29,11 @@ func (h *NodeServerHandler) Register(server *net.Server) {
 }
 
 func (h *NodeServerHandler) NewAgent(agent net.Agent) {
-	h.Node.AgentManager.AddAgent(agent.RemoteAddr().String(), agent)
+	h.agentManager.AddAgent(agent.RemoteAddr().String(), agent)
 }
 
 func (h *NodeServerHandler) CloseAgent(agent net.Agent) {
-	h.Node.AgentManager.RemoveAgent(agent.RemoteAddr().String())
+	h.agentManager.RemoveAgent(agent.RemoteAddr().String())
 }
 
 func (h *NodeServerHandler) OnNodeRegisterReq(message interface{}, agent interface{}) {
@@ -55,7 +59,7 @@ func (h *NodeServerHandler) OnSetNodeStatu(message interface{}, agent interface{
 	log.Debug("Change node statu : NodeId: %v NodeType: %v NodeStatu: %v", a.GetNodeID(), a.GetNodeType(), a.GetNodeStatu())
 
 	if a.GetNodeType() == pb.NODE_TYPE_GAME {
-		gateAgent := h.Node.AgentManager.GetAgentByNodeType([]pb.NODE_TYPE{pb.NODE_TYPE_GATE})
+		gateAgent := h.agentManager.GetAgentByNodeType([]pb.NODE_TYPE{pb.NODE_TYPE_GATE}, nil)
 		net.BroadcastMsg(gateAgent, h.BuildGameNodeList())
 	}
 }
@@ -67,7 +71,7 @@ func (h *NodeServerHandler) OnGameNodeListReq(message interface{}, agent interfa
 }
 
 func (h *NodeServerHandler) BuildGameNodeList() *pb.GameNodeListAck {
-	gameAgents := h.Node.AgentManager.GetAgentByNodeType([]pb.NODE_TYPE{pb.NODE_TYPE_GAME})
+	gameAgents := h.agentManager.GetAgentByNodeType([]pb.NODE_TYPE{pb.NODE_TYPE_GAME}, nil)
 	gameNodeList := pb.GameNodeListAck{}
 	gameNodeList.NodeInfos = []*pb.NodeInfo{}
 

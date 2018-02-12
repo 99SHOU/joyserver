@@ -6,11 +6,20 @@ import (
 )
 
 type NodeClientManager struct {
+	BaseModule
 	clients map[string]*net.Client
 }
 
 func (cm *NodeClientManager) Init() {
 	cm.clients = make(map[string]*net.Client)
+}
+
+func (cm *NodeClientManager) AfterInit() {
+
+}
+
+func (cm *NodeClientManager) BeforeDestroy() {
+
 }
 
 func (cm *NodeClientManager) Destroy() {
